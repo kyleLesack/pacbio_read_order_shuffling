@@ -1,0 +1,16 @@
+name: sniffles
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=conda_forge
+  - _openmp_mutex=4.5=1_gnu
+  - libgcc-ng=9.3.0=h24d8f2e_14
+  - libgomp=9.3.0=h24d8f2e_14
+  - libstdcxx-ng=9.3.0=hdf63c60_14
+  - ngmlr=0.2.7=he513fc3_2
+  - sniffles=1.0.12=h8b12597_0
+  - tclap=1.2.1=h470a237_1
+  - zlib=1.2.11=h516909a_1007
+prefix: /home/kyle.lesack1/miniconda3/envs/sniffles

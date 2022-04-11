@@ -1,0 +1,9 @@
+.snakemake/
+0_input/
+1_fq_processing/
+2_alignments/
+3_variant_calls/
+logs/
+old.Snakefile
+old/
+
