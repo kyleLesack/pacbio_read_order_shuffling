@@ -2,14 +2,17 @@ SPLIT_STRAINS = ["DL238","ECA396","JU2600","ECA36","EG4725","MY2147","JU310"] # 
 NO_SPLIT_STRAINS = ["JU1400", "NIC2", "JU2526", "XZ1516", "MY2693", "QX1794", "NIC526", "DRR142768"]
 ALL_STRAINS = ["JU1400", "NIC2", "JU2526", "XZ1516", "MY2693", "QX1794", "NIC526", "DRR142768", "DL238","ECA396","JU2600","ECA36","EG4725","MY2147","JU310"]
 REFERENCE = "/work/wasmuth_lab/mrkyle/sv_calling_pipeline2/1_prepare_reference/output/c_elegans.PRJNA13758.WS263/c_elegans.PRJNA13758.WS263.genomic.fa"
-ALIGNERS = ["ngmlr","minimap2"]
+REFERENCE_SAW = "/work/wasmuth_lab/mrkyle/sv_calling_pipeline2/1_prepare_reference/output/c_elegans.PRJNA13758.WS263.sawriter/c_elegans.PRJNA13758.WS263.genomic.fa"
+SAM_ALIGNERS = ["ngmlr","minimap2"] # Aligners that output sam files
 SPLIT_DIRS = ["no_split", "needs_split"]
 
 rule all:
 	input:
 		expand("1_fq_processing/all_strains/shuffled/{no_split_strain}/{replicate}/{no_split_strain}_shuffled.fastq", no_split_strain=NO_SPLIT_STRAINS, replicate=[1,2,3,4,5]),
 		expand("1_fq_processing/all_strains/shuffled/{split_strain}/{replicate}/{split_strain}_shuffled.fastq", split_strain=SPLIT_STRAINS, replicate=[1,2,3,4,5]),
-		expand("2_alignments/{aligner}/{strain}/{replicate}/{strain}_shuffled.sam", aligner=ALIGNERS, strain=ALL_STRAINS, replicate=[1,2,3,4,5]),
+		expand("2_alignments/{aligner}/{strain}/{replicate}/{strain}_shuffled.sam", aligner=SAM_ALIGNERS, strain=ALL_STRAINS, replicate=[1,2,3,4,5]),
+		expand("2_alignments/pbmm2/{strain}/{replicate}/{strain}_shuffled.bam", strain=ALL_STRAINS, replicate=[1,2,3,4,5]),
+		expand("3_variant_calls/pbsv/{strain}/{replicate}/{strain}.vcf", strain=ALL_STRAINS, replicate=[1,2,3,4,5]),
 		expand("3_variant_calls/sniffles/{strain}/{replicate}/{strain}.vcf", strain=ALL_STRAINS, replicate=[1,2,3,4,5]),
 		expand("3_variant_calls/svim/{strain}/{replicate}/variants.vcf", strain=ALL_STRAINS, replicate=[1,2,3,4,5]),
 rule split:
@@ -80,6 +83,19 @@ rule shuffle:
 	shell:
 		"shuffle.sh {input} out={output}"
 
+rule pbmm2:
+	input:
+		"1_fq_processing/all_strains/shuffled/{strain}/{REP}/{strain}_shuffled.fastq"
+	output:
+		"2_alignments/pbmm2/{strain}/{REP}/{strain}_shuffled.bam"
+	conda:  "yaml/pbmm2.yaml"
+	threads: 8
+	resources:
+		mem_mb=lambda _, attempt: 50000 + ((attempt - 1) * 10000),
+		time="36:00:00"
+	shell:
+		"pbmm2 align  -j {threads} {REFERENCE_SAW} {input} {output} --sort --median-filter --sample {wildcards.strain}  --rg '@RG\tID:myid\tSM:EG4725'"
+
 rule ngmlr:
 	input:
 		"1_fq_processing/all_strains/shuffled/{strain}/{REP}/{strain}_shuffled.fastq"
@@ -131,6 +147,32 @@ rule sortbam:
 		time_hms="17:00:00"
 	shell:
 		"samtools sort -o {output} {input} -@ 8"
+
+rule pbsvdiscover:
+	input:
+		"2_alignments/pbmm2/{strain}/{REP}/{strain}_shuffled.bam"
+	output:
+		temp("3_variant_calls/pbsv/{strain}/{REP}/{strain}.svsig.gz")
+	conda:  "yaml/pbsv.yaml"
+	threads: 8
+	resources:
+		mem_mb=lambda _, attempt: 50000 + ((attempt - 1) * 10000),
+		time="02:00:00"
+	shell:
+		"pbsv discover {input} {output}"
+                
+rule pbsvcall:
+	input:
+		"3_variant_calls/pbsv/{strain}/{REP}/{strain}.svsig.gz"
+	output:
+		"3_variant_calls/pbsv/{strain}/{REP}/{strain}.vcf"
+	conda:  "yaml/pbsv.yaml"
+	threads: 8
+	resources:
+		mem_mb=lambda _, attempt: 50000 + ((attempt - 1) * 10000),
+		time="08:00:00"
+	shell:
+		"pbsv call -j 8 {REFERENCE_SAW} {input} {output}"                
 
 rule svim:
 	input:
