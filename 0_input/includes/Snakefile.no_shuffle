@@ -36,7 +36,7 @@ rule ngmlr_original:
 	input:
 		"0_input/data/{strain}_all_reads.fastq"
 	output:
-		"2_alignments/ngmlr/{strain}/ORIGINAL/{strain}.sam"
+		temp("2_alignments/ngmlr/{strain}/ORIGINAL/{strain}.sam")
 	conda:  "../../yaml/ngmlr.yaml"
 	threads: 8
 	resources:
@@ -49,7 +49,7 @@ rule minimap2_original:
 	input:
 		"0_input/data/{strain}_all_reads.fastq"
 	output:
-		"2_alignments/minimap2/{strain}/ORIGINAL/{strain}.sam"
+		temp("2_alignments/minimap2/{strain}/ORIGINAL/{strain}.sam")
 	conda:  "../../yaml/pbhoney.yaml"
 	threads: 8
 	resources:
@@ -60,9 +60,11 @@ rule minimap2_original:
 
 rule sam2bam_original:
 	input:
-		"2_alignments/{aligner}/{strain}/ORIGINAL/{strain}.sam"
+		temp("2_alignments/{aligner}/{strain}/ORIGINAL/{strain}.sam")
 	output:
 		temp("2_alignments/{aligner}/{strain}/ORIGINAL/{strain}.bam")
+	wildcard_constraints:
+		aligner = "|".join(SAM_ALIGNERS)
 	conda:  "../../yaml/samtools_1.9.yaml"
 	threads: 8
 	resources:
@@ -76,6 +78,8 @@ rule sortbam_original:
 		"2_alignments/{aligner}/{strain}/ORIGINAL/{strain}.bam"
 	output:
 		"2_alignments/{aligner}/{strain}/ORIGINAL/{strain}_sorted.bam"
+	wildcard_constraints:
+		aligner = "|".join(SAM_ALIGNERS)
 	conda:  "../../yaml/samtools_1.9.yaml"
 	threads: 8
 	resources:
@@ -98,19 +102,6 @@ rule getbamdepth_original:
 		time_hms="04:00:00"
 	shell:
 		"""samtools depth {input} | awk '{{sum+=$3}} END {{ print "Average = ",sum/NR}}' > {output}"""
-
-rule getbamdepthpbmm2_original:
-        input:
-                "2_alignments/pbmm2/{strain}/ORIGINAL/{strain}.bam"
-        output:
-                "2_alignments/pbmm2/{strain}/ORIGINAL/{strain}_depth.txt"
-        conda:  "../../yaml/samtools_1.9.yaml"
-        threads: 1
-        resources:
-                mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
-                time_hms="04:00:00"
-        shell:
-                """samtools depth {input} | awk '{{sum+=$3}} END {{ print "Average = ",sum/NR}}' > {output}"""
 
 rule pbsvdiscover_original:
 	input:
@@ -195,14 +186,12 @@ rule sniffles_original:
 ## SUBSAMPLE BAMS
 rule subsamplengmlrto10x_original:
 	input:
-		"2_alignments/ngmlr/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/ngmlr/{strain}/ORIGINAL/{strain}_sorted.bam"
 	output:
-		"2_alignments/subsampled/10X/ngmlr/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/subsampled/10X/ngmlr/{strain}/ORIGINAL/{strain}_sorted.bam"
 	params:
 		value=lambda wcs: NGMLRDICT10X[wcs.strain]
-	#        wildcard_constraints:
-	#               aligner = "|".join(SAM_ALIGNERS)
-	conda:  "yaml/samtools_1.9.yaml"
+	conda:  "../../yaml/samtools_1.9.yaml"
 	threads: 4
 	resources:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
@@ -212,14 +201,12 @@ rule subsamplengmlrto10x_original:
 
 rule subsamplengmlrto20x_original:
 	input:
-		"2_alignments/ngmlr/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/ngmlr/{strain}/ORIGINAL/{strain}_sorted.bam"
 	output:
-		"2_alignments/subsampled/20X/ngmlr/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/subsampled/20X/ngmlr/{strain}/ORIGINAL/{strain}_sorted.bam"
 	params:
 		value=lambda wcs: NGMLRDICT20X[wcs.strain]
-	#        wildcard_constraints:
-	#               aligner = "|".join(SAM_ALIGNERS)
-	conda:  "yaml/samtools_1.9.yaml"
+	conda:  "../../yaml/samtools_1.9.yaml"
 	threads: 4
 	resources:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
@@ -229,14 +216,12 @@ rule subsamplengmlrto20x_original:
 
 rule subsamplengmlrto40x_original:
 	input:
-		"2_alignments/ngmlr/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/ngmlr/{strain}/ORIGINAL/{strain}_sorted.bam"
 	output:
-		"2_alignments/subsampled/40X/ngmlr/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/subsampled/40X/ngmlr/{strain}/ORIGINAL/{strain}_sorted.bam"
 	params:
 		value=lambda wcs: NGMLRDICT40X[wcs.strain]
-	#        wildcard_constraints:
-	#               aligner = "|".join(SAM_ALIGNERS)
-	conda:  "yaml/samtools_1.9.yaml"
+	conda:  "../../yaml/samtools_1.9.yaml"
 	threads: 4
 	resources:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
@@ -246,14 +231,12 @@ rule subsamplengmlrto40x_original:
 
 rule subsamplengmlrto60x_original:
 	input:
-		"2_alignments/ngmlr/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/ngmlr/{strain}/ORIGINAL/{strain}_sorted.bam"
 	output:
-		"2_alignments/subsampled/60X/ngmlr/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/subsampled/60X/ngmlr/{strain}/ORIGINAL/{strain}_sorted.bam"
 	params:
 		value=lambda wcs: NGMLRDICT60X[wcs.strain]
-	#        wildcard_constraints:
-	#               aligner = "|".join(SAM_ALIGNERS)
-	conda:  "yaml/samtools_1.9.yaml"
+	conda:  "../../yaml/samtools_1.9.yaml"
 	threads: 4
 	resources:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
@@ -263,14 +246,12 @@ rule subsamplengmlrto60x_original:
 
 rule subsampleminimap2to10x_original:
 	input:
-		"2_alignments/minimap2/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/minimap2/{strain}/ORIGINAL/{strain}_sorted.bam"
 	output:
-		"2_alignments/subsampled/10X/minimap2/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/subsampled/10X/minimap2/{strain}/ORIGINAL/{strain}_sorted.bam"
 	params:
 		value=lambda wcs: MINIMAPDICT10X[wcs.strain]
-	#        wildcard_constraints:
-	#               aligner = "|".join(SAM_ALIGNERS)
-	conda:  "yaml/samtools_1.9.yaml"
+	conda:  "../../yaml/samtools_1.9.yaml"
 	threads: 4
 	resources:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
@@ -280,14 +261,12 @@ rule subsampleminimap2to10x_original:
 
 rule subsampleminimap2to20x_original:
 	input:
-		"2_alignments/minimap2/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/minimap2/{strain}/ORIGINAL/{strain}_sorted.bam"
 	output:
-		"2_alignments/subsampled/20X/minimap2/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/subsampled/20X/minimap2/{strain}/ORIGINAL/{strain}_sorted.bam"
 	params:
 		value=lambda wcs: MINIMAPDICT20X[wcs.strain]
-	#        wildcard_constraints:
-	#               aligner = "|".join(SAM_ALIGNERS)
-	conda:  "yaml/samtools_1.9.yaml"
+	conda:  "../../yaml/samtools_1.9.yaml"
 	threads: 4
 	resources:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
@@ -297,14 +276,12 @@ rule subsampleminimap2to20x_original:
 
 rule subsampleminimap2to40x_original:
 	input:
-		"2_alignments/minimap2/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/minimap2/{strain}/ORIGINAL/{strain}_sorted.bam"
 	output:
-		"2_alignments/subsampled/40X/minimap2/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/subsampled/40X/minimap2/{strain}/ORIGINAL/{strain}_sorted.bam"
 	params:
 		value=lambda wcs: MINIMAPDICT40X[wcs.strain]
-	#        wildcard_constraints:
-	#               aligner = "|".join(SAM_ALIGNERS)
-	conda:  "yaml/samtools_1.9.yaml"
+	conda:  "../../yaml/samtools_1.9.yaml"
 	threads: 4
 	resources:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
@@ -314,14 +291,12 @@ rule subsampleminimap2to40x_original:
 
 rule subsampleminimap2to60x_original:
 	input:
-		"2_alignments/minimap2/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/minimap2/{strain}/ORIGINAL/{strain}_sorted.bam"
 	output:
-		"2_alignments/subsampled/60X/minimap2/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/subsampled/60X/minimap2/{strain}/ORIGINAL/{strain}_sorted.bam"
 	params:
 		value=lambda wcs: MINIMAPDICT60X[wcs.strain]
-	#        wildcard_constraints:
-	#               aligner = "|".join(SAM_ALIGNERS)
-	conda:  "yaml/samtools_1.9.yaml"
+	conda:  "../../yaml/samtools_1.9.yaml"
 	threads: 4
 	resources:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
@@ -331,14 +306,12 @@ rule subsampleminimap2to60x_original:
 
 rule subsamplepbmm2to10x_original:
 	input:
-		"2_alignments/pbmm2/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/pbmm2/{strain}/ORIGINAL/{strain}_sorted.bam"
 	output:
-		"2_alignments/subsampled/10X/pbmm2/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/subsampled/10X/pbmm2/{strain}/ORIGINAL/{strain}_sorted.bam"
 	params:
 		value=lambda wcs: PBMMDICT10X[wcs.strain]
-	#        wildcard_constraints:
-	#               aligner = "|".join(SAM_ALIGNERS)
-	conda:  "yaml/samtools_1.9.yaml"
+	conda:  "../../yaml/samtools_1.9.yaml"
 	threads: 4
 	resources:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
@@ -348,14 +321,12 @@ rule subsamplepbmm2to10x_original:
 
 rule subsamplepbmm2to20x_original:
 	input:
-		"2_alignments/pbmm2/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/pbmm2/{strain}/ORIGINAL/{strain}_sorted.bam"
 	output:
-		"2_alignments/subsampled/20X/pbmm2/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/subsampled/20X/pbmm2/{strain}/ORIGINAL/{strain}_sorted.bam"
 	params:
 		value=lambda wcs: PBMMDICT20X[wcs.strain]
-	#        wildcard_constraints:
-	#               aligner = "|".join(SAM_ALIGNERS)
-	conda:  "yaml/samtools_1.9.yaml"
+	conda:  "../../yaml/samtools_1.9.yaml"
 	threads: 4
 	resources:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
@@ -365,14 +336,12 @@ rule subsamplepbmm2to20x_original:
 
 rule subsamplepbmm2to40x_original:
 	input:
-		"2_alignments/pbmm2/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/pbmm2/{strain}/ORIGINAL/{strain}_sorted.bam"
 	output:
-		"2_alignments/subsampled/40X/pbmm2/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/subsampled/40X/pbmm2/{strain}/ORIGINAL/{strain}_sorted.bam"
 	params:
 		value=lambda wcs: PBMMDICT40X[wcs.strain]
-	#        wildcard_constraints:
-	#               aligner = "|".join(SAM_ALIGNERS)
-	conda:  "yaml/samtools_1.9.yaml"
+	conda:  "../../yaml/samtools_1.9.yaml"
 	threads: 4
 	resources:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
@@ -382,17 +351,95 @@ rule subsamplepbmm2to40x_original:
 
 rule subsamplepbmm2to60x_original:
 	input:
-		"2_alignments/pbmm2/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/pbmm2/{strain}/ORIGINAL/{strain}_sorted.bam"
 	output:
-		"2_alignments/subsampled/60X/pbmm2/{strain}/ORIGINAL/{strain}_shuffled_sorted.bam"
+		"2_alignments/subsampled/60X/pbmm2/{strain}/ORIGINAL/{strain}_sorted.bam"
 	params:
 		value=lambda wcs: PBMMDICT60X[wcs.strain]
-	#        wildcard_constraints:
-	#               aligner = "|".join(SAM_ALIGNERS)
-	conda:  "yaml/samtools_1.9.yaml"
+	conda:  "../../yaml/samtools_1.9.yaml"
 	threads: 4
 	resources:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
 		time_hms="08:00:00"
 	shell:
 		"""samtools view -@ {threads} -b -s {params.value} -b {input} > {output}"""
+
+rule pbsvdiscover_subsampled_original:
+	input:
+		"2_alignments/subsampled/{depth}X/{aligner}/{strain}/ORIGINAL/{strain}_sorted.bam"
+	output:
+		temp("3_variant_calls/subsampled/{depth}X/{aligner}/{strain}/ORIGINAL/{strain}.svsig.gz")
+	wildcard_constraints:
+		aligner = "|".join(PBSV_ALIGNERS)
+	conda:  "../../yaml/pbsv.yaml"
+	threads: 8
+	resources:
+		mem_mb=lambda _, attempt: 50000 + ((attempt - 1) * 10000),
+		time="02:00:00"
+	shell:
+		"pbsv discover {input} {output}"
+
+rule pbsvcall_subsampled_original:
+	input:
+		"3_variant_calls/subsampled/{depth}X/{aligner}/{strain}/ORIGINAL/{strain}.svsig.gz"
+	output:
+		"3_variant_calls/subsampled/{depth}X/{aligner}/pbsv/{strain}/ORIGINAL/{strain}.vcf"
+	wildcard_constraints:
+		aligner = "|".join(PBSV_ALIGNERS)
+	conda:  "../../yaml/pbsv.yaml"
+	threads: 8
+	resources:
+		mem_mb=lambda _, attempt: 50000 + ((attempt - 1) * 10000),
+		time="08:00:00"
+	shell:
+		"pbsv call -j 8 {REFERENCE_SAW} {input} {output}"
+
+rule svim_subsampled_original:
+	input:
+		"2_alignments/subsampled/{depth}X/{aligner}/{strain}/ORIGINAL/{strain}_sorted.bam"
+	output:
+		"3_variant_calls/subsampled/{depth}X/{aligner}/svim/{strain}/ORIGINAL/variants.vcf"
+	wildcard_constraints:
+		aligner = "|".join(SVIM_ALIGNERS)
+	params:
+		outdir="3_variant_calls/subsampled/{depth}X/{aligner}/svim/{strain}/ORIGINAL/"
+	conda:  "../../yaml/svim.yaml"
+	threads: 8
+	resources:
+		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
+		time_hms="12:00:00"
+	shell:
+		"svim alignment {params.outdir} {input} {REFERENCE}"
+
+rule indexbam_subsampled_original:
+	input:
+		"2_alignments/subsampled/{depth}X/{aligner}/{strain}/ORIGINAL/{strain}_sorted.bam"
+	output:
+		"2_alignments/subsampled/{depth}X/{aligner}/{strain}/ORIGINAL/{strain}_sorted.bam.bai"
+	wildcard_constraints:
+		aligner = "|".join(SNIFFLES_ALIGNERS)
+	conda:  "../../yaml/samtools_1.9.yaml"
+	threads: 8
+	resources:
+		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
+		time_hms="12:00:00"
+	shell:
+		"samtools index -@ {threads} {input} {output}"
+
+rule sniffles_subsampled_original:
+	input:
+		"2_alignments/subsampled/{depth}X/{aligner}/{strain}/ORIGINAL/{strain}_sorted.bam",
+		"2_alignments/subsampled/{depth}X/{aligner}/{strain}/ORIGINAL/{strain}_sorted.bam.bai"
+	output:
+		"3_variant_calls/subsampled/{depth}X/{aligner}/sniffles/{strain}/ORIGINAL/{strain}.vcf"
+	wildcard_constraints:
+		aligner = "|".join(SNIFFLES_ALIGNERS)
+	params:
+		bamfile="2_alignments/{aligner}/{strain}/ORIGINAL/{strain}_sorted.bam"
+	conda:  "../../yaml/sniffles2.yaml"
+	threads: 8
+	resources:
+		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
+		time_hms="12:00:00"
+	shell:
+		"sniffles --input {params.bamfile} -t 8 --vcf {output}"
