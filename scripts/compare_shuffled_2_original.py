@@ -421,7 +421,22 @@ def compare_vcf_total_predictions_new(caller_shuffled, caller_original):
 
 	return(intersection_statistics, unique_calls_original, unique_calls_shuffled)	
 
-if args.sv_caller.lower() == "svim":
+if args.sv_caller.lower() == "pbsv":
+	with open(args.original_vcf) as f:
+		original_variants = f.readlines()
+		pbsv_original = parse_pbsv(original_variants)
+
+	with open(args.shuffled_vcf) as f:
+		shuffled_variants = f.readlines()
+		pbsv_shuffled = parse_pbsv(shuffled_variants)
+
+		vcf_comparison_total_svs = compare_vcf_total_predictions_new(pbsv_shuffled, pbsv_original)
+		vcf_comparison_breakpoints = compare_vcf_breakpoints(pbsv_shuffled, pbsv_original)
+		
+		write_result_statistics(vcf_comparison_total_svs[0], vcf_comparison_breakpoints[0])
+		write_unique(vcf_comparison_total_svs[1], vcf_comparison_total_svs[2], vcf_comparison_breakpoints[1])
+
+elif args.sv_caller.lower() == "svim":
 	with open(args.original_vcf) as f:
 		original_variants = f.readlines()
 		svim_original = parse_svim(original_variants)
@@ -436,7 +451,7 @@ if args.sv_caller.lower() == "svim":
 		write_result_statistics(vcf_comparison_total_svs[0], vcf_comparison_breakpoints[0])
 		write_unique(vcf_comparison_total_svs[1], vcf_comparison_total_svs[2], vcf_comparison_breakpoints[1])
 
-if args.sv_caller.lower() == "sniffles":
+elif args.sv_caller.lower() == "sniffles":
 	with open(args.original_vcf) as f:
 		original_variants = f.readlines()
 		sniffles_original = parse_sniffles(original_variants)
