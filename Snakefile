@@ -546,7 +546,7 @@ rule compare_pbsv:
 
 rule concatenate_total_svs_sniffles:
 	input:
-		expand("3_variant_calls/{{aligner}}/sniffles/{strain}/{replicate}/summary/summary_total_svs.csv", strain=ALL_STRAINS, replicate=[1]),
+		expand("3_variant_calls/full_depth/{{aligner}}/sniffles/{strain}/{replicate}/summary/summary_total_svs.csv", strain=ALL_STRAINS, replicate=[1]),
 	output:
 		"4_summaries/concatenated/{aligner}/sniffles/total_svs.csv"
 	params:
@@ -568,7 +568,7 @@ rule concatenate_total_breakpoints_sniffles:
 
 rule concatenate_total_svs_svim:
 	input:
-		expand("3_variant_calls/{{aligner}}/svim/{strain}/{replicate}/QUAL_0/summary/summary_total_svs.csv", strain=ALL_STRAINS, replicate=[1]),
+		expand("3_variant_calls/full_depth/{{aligner}}/svim/{strain}/{replicate}/QUAL_0/summary/summary_total_svs.csv", strain=ALL_STRAINS, replicate=[1]),
 	output:
 		"4_summaries/concatenated/{aligner}/svim/QUAL_0/total_svs.csv",
 	params:
@@ -590,7 +590,7 @@ rule concatenate_total_breakpoints_svim:
 
 rule concatenate_total_svs_pbsv:
 	input:
-		expand("3_variant_calls/pbmm2/pbsv/{strain}/{replicate}/summary/summary_total_svs.csv", strain=ALL_STRAINS, replicate=[1]),
+		expand("3_variant_calls/full_depth/pbmm2/pbsv/{strain}/{replicate}/summary/summary_total_svs.csv", strain=ALL_STRAINS, replicate=[1]),
 	output:
 		"4_summaries/concatenated/pbmm2/pbsv/total_svs.csv",
 	params:
@@ -826,7 +826,7 @@ rule compare_pbsv_subsampled:
 
 rule concatenate_total_svs_svim_qual15:
 	input:
-		expand("3_variant_calls/{{aligner}}/svim/{strain}/{replicate}/QUAL_15/summary/summary_total_svs.csv", strain=ALL_STRAINS, replicate=[1]),
+		expand("3_variant_calls/full_depth/{{aligner}}/svim/{strain}/{replicate}/QUAL_15/summary/summary_total_svs.csv", strain=ALL_STRAINS, replicate=[1]),
 	output:
 		"4_summaries/concatenated/{aligner}/svim/QUAL_15/total_svs.csv",
 	params:
