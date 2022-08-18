@@ -210,7 +210,7 @@ def parse_svim(svim_variants):
 	return (callerDict)
 
 def compare_vcf_breakpoints(caller_shuffled, caller_original):
-	intersection_statistics = [["FILTER,SVTYPE,INTERSECTION,SAME_BREAKPOINTS,DIFFERENT_BREAKPOINTS"]] # Store comparison statistics: shuffled_filter, sv_type, intersection size, unique to original, unique to shuffled
+	intersection_statistics = [["FILTER,SVTYPE,INTERSECTION,SAME_BREAKPOINTS,DIFFERENT_BREAKPOINTS,DISCORDANT_PROPORTION"]] # Store comparison statistics: shuffled_filter, sv_type, intersection size, unique to original, unique to shuffled
 	different_breakpoints = [] # Store variants called by both the original and shuffled VCF files but with different breakpoints
 	original_filters = caller_original.keys()
 	shuffled_filters = caller_shuffled.keys()
@@ -246,13 +246,16 @@ def compare_vcf_breakpoints(caller_shuffled, caller_original):
 							different_breakpoints.append(x)
 						else:
 							same_breakpoint_count +=1
-					intersection_statistics_line = [sv_filter,sv_type, len(bedfile_intersection),same_breakpoint_count,different_breakpoint_count]
+
+					discordant_proportion = different_breakpoint_count / len(bedfile_intersection)
+					intersection_statistics_line = [sv_filter,sv_type, len(bedfile_intersection),same_breakpoint_count,different_breakpoint_count,discordant_proportion]
 					intersection_statistics.append(intersection_statistics_line)
 					#intersection_statistics.append(','.join(str(e) for e in intersection_statistics_line))
 	total_intersection = sum([int(row[2]) for row in intersection_statistics[1:]])
 	total_same_breakpoints = sum([int(row[3]) for row in intersection_statistics[1:]])
 	total_different_breakpoints = sum([int(row[4]) for row in intersection_statistics[1:]])
-	intersection_statistics.append(["Total","ALL_SVS", total_intersection, total_same_breakpoints, total_different_breakpoints])
+	total_discordant = total_different_breakpoints / total_intersection
+	intersection_statistics.append(["Total","ALL_SVS", total_intersection, total_same_breakpoints, total_different_breakpoints, total_discordant])
 
 	return intersection_statistics, different_breakpoints
 
@@ -388,7 +391,9 @@ def get_intersection_statistics(caller_original, caller_shuffled, sv_filter, sv_
 		shuffled_only_bedfile = bedfile_shuffled.intersect(bedfile_original, v=True) # -v	Only report those entries in A that have no overlap in B. Restricted by -f and -r.
 		for line in shuffled_only_bedfile:
 			shuffled_only.append(sv_filter + "," + sv_type + "," + str(line).replace("\t",","))
-		bedfile_intersection_statistics = [sv_filter, sv_type, len(bedfile_intersection), len(original_only_bedfile), len(shuffled_only_bedfile)]
+		unique_call_count = len(original_only_bedfile) + len(shuffled_only_bedfile)
+		unique_call_proportion = unique_call_count / len(bedfile_intersection)
+		bedfile_intersection_statistics = [sv_filter, sv_type, len(bedfile_intersection), len(original_only_bedfile), len(shuffled_only_bedfile), unique_call_count,unique_call_proportion]
 
 	else:
 		bnd_calls_original_set = set(sv_calls_original)
@@ -396,7 +401,10 @@ def get_intersection_statistics(caller_original, caller_shuffled, sv_filter, sv_
 		bnd_intersection = bnd_calls_original_set.intersection(bnd_calls_shuffled_set)
 		bnd_calls_original_only = bnd_calls_original_set.difference(bnd_calls_shuffled_set)
 		bnd_calls_shuffled_only = bnd_calls_shuffled_set.difference(bnd_calls_original_set)
-		bedfile_intersection_statistics = [sv_filter, sv_type, len(bnd_intersection), len(bnd_calls_original_only ), len(bnd_calls_shuffled_only)]
+		unique_call_count = len(bnd_calls_original_only) + len(bnd_calls_shuffled_only)
+		unique_call_proportion = unique_call_count / len(bnd_intersection)
+		bedfile_intersection_statistics = [sv_filter, sv_type, len(bnd_intersection), len(bnd_calls_original_only ), len(bnd_calls_shuffled_only), unique_call_count, unique_call_proportion]
+
 		for line in bnd_calls_original_only:
 			unique_line = sv_filter + "," + sv_type + "," + line.replace("\t",",")
 			original_only.append(unique_line)
@@ -412,7 +420,7 @@ def compare_vcf_total_predictions_new(caller_shuffled, caller_original):
 	warning_messages = set()
 	unique_calls_original = [] # Store calls unique to the original vcf in list, excludes BND, INS
 	unique_calls_shuffled = [] # Store calls unique to the shuffled vcf in list, excludes BND, INS
-	intersection_statistics = [["FILTER","SVTYPE","INTERSECTION","ORIGINAL_ONLY","SHUFFLED_ONLY"]] # Store comparison statistics: shuffled_filter, sv_type, intersection size, unique to original, unique to shuffled
+	intersection_statistics = [["FILTER","SVTYPE","INTERSECTION","ORIGINAL_ONLY","SHUFFLED_ONLY","UNIQUE","UNIQUE_PROPORTION"]] # Store comparison statistics: shuffled_filter, sv_type, intersection size, unique to original, unique to shuffled
 	shuffled_filters = caller_shuffled.keys()
 	original_filters = caller_original.keys()
 	common_filters = set(original_filters) & set(shuffled_filters)
@@ -425,7 +433,7 @@ def compare_vcf_total_predictions_new(caller_shuffled, caller_original):
 			warning_messages.add("Filter: " + original_filter + " not found in shuffled vcf file")
 			for sv_type in caller_original[original_filter].keys():
 				unique_calls_original_stats = get_unique_filter_sv_type_statistics(caller_original, original_filter, sv_type)
-				bedfile_intersection_statistics = [original_filter, sv_type, 0, unique_calls_original_stats[0], 0]
+				bedfile_intersection_statistics = [original_filter, sv_type, 0, unique_calls_original_stats[0], 0, unique_calls_original_stats[0], 1]
 				#print(bedfile_intersection_statistics)
 				intersection_statistics.append(bedfile_intersection_statistics)
 				unique_calls_original.extend(unique_calls_original_stats[1])
@@ -435,7 +443,7 @@ def compare_vcf_total_predictions_new(caller_shuffled, caller_original):
 			warning_messages.add("Filter: " + shuffled_filter + " not found in original vcf file")
 			for sv_type in caller_shuffled[shuffled_filter].keys():
 				unique_calls_shuffled_stats = get_unique_filter_sv_type_statistics(caller_shuffled, shuffled_filter, sv_type)
-				bedfile_intersection_statistics = [shuffled_filter, sv_type, 0, 0, unique_calls_shuffled_stats[0]]
+				bedfile_intersection_statistics = [shuffled_filter, sv_type, 0, 0, unique_calls_shuffled_stats[0],unique_calls_shuffled_stats[0], 1]
 				#print(bedfile_intersection_statistics)
 				intersection_statistics.append(bedfile_intersection_statistics)
 				unique_calls_shuffled.extend(unique_calls_shuffled_stats[1])
@@ -450,7 +458,7 @@ def compare_vcf_total_predictions_new(caller_shuffled, caller_original):
 		for sv_type in sv_original_only:
 			warning_messages.add("SV Type: " + sv_type + " not found in shuffled vcf file")
 			unique_calls_original_stats = get_unique_filter_sv_type_statistics(caller_original, common_filter, sv_type)
-			bedfile_intersection_statistics = [common_filter, sv_type, 0, unique_calls_original_stats[0], 0]
+			bedfile_intersection_statistics = [common_filter, sv_type, 0, unique_calls_original_stats[0], 0,unique_calls_original_stats[0], 1]
 			#print(bedfile_intersection_statistics)
 			intersection_statistics.append(bedfile_intersection_statistics)
 
@@ -459,7 +467,7 @@ def compare_vcf_total_predictions_new(caller_shuffled, caller_original):
 		for sv_type in sv_shuffled_only:
 			warning_messages.add("SV Type: " + sv_type + " not found in original vcf file")
 			unique_calls_shuffled_stats = get_unique_filter_sv_type_statistics(caller_shuffled, common_filter, sv_type)
-			bedfile_intersection_statistics = [common_filter, sv_type, 0, 0, unique_calls_shuffled_stats[0]]
+			bedfile_intersection_statistics = [common_filter, sv_type, 0, 0, unique_calls_shuffled_stats[0],unique_calls_shuffled_stats[0], 1]
 			#print(bedfile_intersection_statistics)
 			intersection_statistics.append(bedfile_intersection_statistics)
 			unique_calls_shuffled.extend(unique_calls_shuffled_stats[1])
@@ -477,7 +485,9 @@ def compare_vcf_total_predictions_new(caller_shuffled, caller_original):
 	total_intersection = sum([int(row[2]) for row in intersection_statistics[1:]])
 	total_original_only = sum([int(row[3]) for row in intersection_statistics[1:]])
 	total_shuffled_only = sum([int(row[4]) for row in intersection_statistics[1:]])
-	intersection_statistics.append(["Total","ALL_SVS", total_intersection, total_original_only, total_shuffled_only])
+	total_unique = sum([int(row[5]) for row in intersection_statistics[1:]])
+	total_unique_proportion = total_unique / total_intersection
+	intersection_statistics.append(["Total","ALL_SVS", total_intersection, total_original_only, total_shuffled_only, total_unique, total_unique_proportion])
 
 	return(intersection_statistics, unique_calls_original, unique_calls_shuffled)
 
