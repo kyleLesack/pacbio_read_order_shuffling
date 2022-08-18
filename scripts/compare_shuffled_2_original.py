@@ -246,10 +246,10 @@ def compare_vcf_breakpoints(caller_shuffled, caller_original):
 							different_breakpoints.append(x)
 						else:
 							same_breakpoint_count +=1
-
-					discordant_proportion = different_breakpoint_count / len(bedfile_intersection)
-					intersection_statistics_line = [sv_filter,sv_type, len(bedfile_intersection),same_breakpoint_count,different_breakpoint_count,discordant_proportion]
-					intersection_statistics.append(intersection_statistics_line)
+					if len(bedfile_intersection) > 0:
+						discordant_proportion = different_breakpoint_count / len(bedfile_intersection)
+						intersection_statistics_line = [sv_filter,sv_type, len(bedfile_intersection),same_breakpoint_count,different_breakpoint_count,discordant_proportion]
+						intersection_statistics.append(intersection_statistics_line)
 					#intersection_statistics.append(','.join(str(e) for e in intersection_statistics_line))
 	total_intersection = sum([int(row[2]) for row in intersection_statistics[1:]])
 	total_same_breakpoints = sum([int(row[3]) for row in intersection_statistics[1:]])
