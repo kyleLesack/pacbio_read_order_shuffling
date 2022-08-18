@@ -181,17 +181,17 @@ rule getbamdepth:
 		"""samtools depth {input} | awk '{{sum+=$3}} END {{ print "Average = ",sum/NR}}' > {output}"""
 
 rule getbamdepthpbmm2:
-        input:
-                "2_alignments/pbmm2/{strain}/{REP}/{strain}_shuffled.bam"
-        output:
-                "2_alignments/pbmm2/{strain}/{REP}/{strain}_depth.txt"
-        conda:  "yaml/samtools_1.9.yaml"
-        threads: 1
-        resources:
-                mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
-                time_hms="04:00:00"
-        shell:
-                """samtools depth {input} | awk '{{sum+=$3}} END {{ print "Average = ",sum/NR}}' > {output}"""
+	input:
+		"2_alignments/pbmm2/{strain}/{REP}/{strain}_shuffled.bam"
+	output:
+		"2_alignments/pbmm2/{strain}/{REP}/{strain}_depth.txt"
+	conda:  "yaml/samtools_1.9.yaml"
+	threads: 1
+	resources:
+		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
+		time_hms="04:00:00"
+	shell:
+		"""samtools depth {input} | awk '{{sum+=$3}} END {{ print "Average = ",sum/NR}}' > {output}"""
 
 ## SUBSAMPLE BAMS
 rule subsamplengmlrto10x:
@@ -474,7 +474,7 @@ rule sniffles:
 		REP = "|".join(["1","2","3","4","5"])
 	params:
 		bamfile="2_alignments/{aligner}/{strain}/{REP}/{strain}_shuffled_sorted.bam"
-	conda:  "yaml/sniffles2.yaml"
+	conda:  "yaml/sniffles.yaml"
 	threads: 8
 	resources:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
@@ -688,7 +688,7 @@ rule sniffles_subsampled:
 		REP = "|".join(["1","2","3","4","5"])
 	params:
 		bamfile="2_alignments/subsampled/{depth}X/{aligner}/{strain}/{REP}/{strain}_shuffled_sorted.bam"
-	conda:  "yaml/sniffles2.yaml"
+	conda:  "yaml/sniffles.yaml"
 	threads: 8
 	resources:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
