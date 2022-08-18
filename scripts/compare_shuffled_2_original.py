@@ -18,7 +18,67 @@ SVIM_SV_TYPES = ["INV", "DEL","DUP:INT", "DUP:TANDEM","INS","DUP","BND"]
 
 from collections import defaultdict
 
+# Extract pbsv variants
+def parse_pbsv(pbsv_variants):
+	callerDict = defaultdict(lambda: defaultdict(list)) # Store variants in dict
 
+	for line in pbsv_variants:
+		if line[0] != "#":
+			line_split = line.split()
+			chromosome = line_split[0]
+			start_coord = line_split[1]
+			variant_name = line_split[2]
+			#variant_qual = int(line_split[5]) # pbsv qual score
+			filter_line = line_split[6] # Describes if variant call passed.
+			info_line = line_split[7] # Get info field metadata
+			info_line_split = info_line.split(";")
+			if info_line_split[0] == "IMPRECISE":
+				filter_line = filter_line + "-IMPRECISE"
+			end_coord = None
+			variant_type = None
+			variant_size = None
+
+			# Get the end coordinate, variant type, and size
+			for x in info_line_split:
+				if "END=" in x:
+					end_coord = x.split("=")[1]
+					variant_size = int(end_coord) - int(start_coord)
+				elif "SVTYPE=" in x:
+					variant_type = x.split("=")[1]
+				elif "SVLEN=" in x:
+					variant_size_vcf = x.split("=")[1]
+
+			if variant_type is not None:
+				if variant_type != "BND":
+					if variant_type == "INS":
+						abs_variant_size= abs(int(variant_size_vcf))
+					else:
+						variant_size_from_coords = int(end_coord) - int(start_coord)
+						abs_variant_size= abs(int(variant_size_from_coords))
+
+					if variant_type in PBSV_SV_TYPES and abs_variant_size >= args.minsize:
+						#bed_line = chromosome + "\t" + start_coord + "\t" + end_coord + "\t" + variant_name + "\tSupport:" + str(variant_qual)
+						bed_line = chromosome + "\t" + start_coord + "\t" + end_coord
+						callerDict[filter_line][variant_type].append(bed_line)
+					else:
+						print("Excluding: " + line)
+						if variant_type not in pbsv_SV_TYPES:
+							print("Invalid variant type: " + variant_type)
+						#if variant_qual < args.min_qual_pbsv:
+						#	print("pbsv Qual too low: " + variant_qual)
+						if abs_variant_size_from_coords < args.minsize:
+							print("Variant too small: " + str(abs_variant_size_from_coords))
+				else:
+					#if variant_qual >= args.min_qual_pbsv:
+					end_coord = line_split[4]
+					#bed_line = chromosome + "\t" + start_coord + "\t" + end_coord + "\t" + variant_name + "\tSupport:" + str(variant_qual)
+					bed_line = chromosome + "\t" + start_coord + "\t" + end_coord
+					callerDict[filter_line][variant_type].append(bed_line)
+			else:
+				print("Variant type is none")
+				print(line)
+
+	return (callerDict)
 
 # Extract variant calls from sniffles
 def parse_sniffles(sniffles_variants):
@@ -215,11 +275,11 @@ def write_result_statistics(intersection_statistics_total_calls,intersection_sta
 	header = (','.join(str(e) for e in header) + "\n")
 	footer = intersection_statistics_total_calls[-1]
 	footer = (','.join(str(e) for e in footer) + "\n")
-		
+
 	for line in intersection_statistics_total_calls[1:-1]:
 		intersection_statistics_total_calls_string.append(','.join(str(e) for e in line))
 	intersection_statistics_sorted = sorted(intersection_statistics_total_calls_string, key=str.casefold,reverse=True)
-	
+
 	print("Writing to: " + output_file)
 	with open(output_file, 'w', newline='\n') as f:
 		f.write(header)
@@ -232,17 +292,17 @@ def write_result_statistics(intersection_statistics_total_calls,intersection_sta
 	header = (','.join(str(e) for e in header) + "\n")
 	footer = intersection_statistics_breakpoints[-1]
 	footer = (','.join(str(e) for e in footer) + "\n")
-	
+
 	for line in intersection_statistics_breakpoints[1:-1]:
 		intersection_statistics_breakpoints_string.append(','.join(str(e) for e in line))
 	intersection_statistics_breakpoints_sorted = sorted(intersection_statistics_breakpoints_string, key=str.casefold,reverse=True)
-	
+
 	print("Writing to: " + output_file)
 	with open(output_file, 'w', newline='\n') as f:
 		f.write(header)
 		f.writelines("%s\n" % l for l in intersection_statistics_breakpoints_sorted)
 		f.write(footer)
-		
+
 # Write variant calls to disk
 def write_unique(unique_calls_original, unique_calls_shuffled, different_breakpoints):
 	vcf_dir = os.path.dirname(args.shuffled_vcf) # use vcf filename for bedfile
@@ -271,21 +331,21 @@ def write_unique(unique_calls_original, unique_calls_shuffled, different_breakpo
 	#header = (','.join(str(e) for e in header) + "\n")
 	#footer = intersection_statistics_total_calls[-1]
 	#footer = (','.join(str(e) for e in footer) + "\n")
-		
+
 	#for line in intersection_statistics_total_calls[1:-1]:
 	#	intersection_statistics_total_calls_string.append(','.join(str(e) for e in line))
 	#intersection_statistics_sorted = sorted(intersection_statistics_total_calls_string, key=str.casefold,reverse=True)
-	
-	
+
+
 	#with open(output_file, 'w', newline='\n') as f:
 	#	f.write(header)
 	#	f.writelines("%s\n" % l for l in intersection_statistics_sorted)
-	#	f.write(footer)		
+	#	f.write(footer)
 
 
-# Function to return summarize the statistics for unique calls 
-# Unique calls correspond to either: 
-# sv type not found in calls from the original or shuffled fastqs for a filter found in both of them 
+# Function to return summarize the statistics for unique calls
+# Unique calls correspond to either:
+# sv type not found in calls from the original or shuffled fastqs for a filter found in both of them
 # filter not in calls from the original or shuffled fastqs
 def get_unique_filter_sv_type_statistics(variant_dict, sv_filter, sv_type):
 	unique_calls = [] # Store unique call lines to write to file
@@ -295,13 +355,13 @@ def get_unique_filter_sv_type_statistics(variant_dict, sv_filter, sv_type):
 		unique_line = sv_filter + "," + sv_type + "," + line.replace("\t",",")
 		unique_calls.append(unique_line)
 
-	sv_calls_unique = variant_dict[sv_filter][sv_type]	
+	sv_calls_unique = variant_dict[sv_filter][sv_type]
 	if sv_type != "BND":
-		
+
 		bedlines_unique = '\n'.join(str(e) for e in sv_calls_unique)
 		bedfile_unique = BedTool(bedlines_unique, from_string=True)
 		bedfile_unique_length = len(bedfile_unique)
-	
+
 	else:
 		bnd_calls = set(sv_calls_unique)
 		bedfile_unique_length = len(bnd_calls)
@@ -324,7 +384,7 @@ def get_intersection_statistics(caller_original, caller_shuffled, sv_filter, sv_
 		original_only_bedfile = bedfile_original.intersect(bedfile_shuffled, v=True) # -v	Only report those entries in A that have no overlap in B. Restricted by -f and -r.
 		for line in original_only_bedfile:
 			original_only.append(sv_filter + "," + sv_type + "," + str(line).replace("\t",","))
-		
+
 		shuffled_only_bedfile = bedfile_shuffled.intersect(bedfile_original, v=True) # -v	Only report those entries in A that have no overlap in B. Restricted by -f and -r.
 		for line in shuffled_only_bedfile:
 			shuffled_only.append(sv_filter + "," + sv_type + "," + str(line).replace("\t",","))
@@ -355,7 +415,7 @@ def compare_vcf_total_predictions_new(caller_shuffled, caller_original):
 	intersection_statistics = [["FILTER","SVTYPE","INTERSECTION","ORIGINAL_ONLY","SHUFFLED_ONLY"]] # Store comparison statistics: shuffled_filter, sv_type, intersection size, unique to original, unique to shuffled
 	shuffled_filters = caller_shuffled.keys()
 	original_filters = caller_original.keys()
-	common_filters = set(original_filters) & set(shuffled_filters) 
+	common_filters = set(original_filters) & set(shuffled_filters)
 	filter_original_only = set(original_filters) - set(shuffled_filters)
 	filter_shuffled_only = set(shuffled_filters) - set(original_filters)
 	#print("Length caller_shuffled (2): " + str(len(caller_shuffled)))
@@ -369,7 +429,7 @@ def compare_vcf_total_predictions_new(caller_shuffled, caller_original):
 				#print(bedfile_intersection_statistics)
 				intersection_statistics.append(bedfile_intersection_statistics)
 				unique_calls_original.extend(unique_calls_original_stats[1])
-	
+
 	if len(filter_shuffled_only) > 0: # Find variant calls with filters only found using the shuffled fastq file
 		for shuffled_filter in filter_shuffled_only:
 			warning_messages.add("Filter: " + shuffled_filter + " not found in original vcf file")
@@ -378,31 +438,31 @@ def compare_vcf_total_predictions_new(caller_shuffled, caller_original):
 				bedfile_intersection_statistics = [shuffled_filter, sv_type, 0, 0, unique_calls_shuffled_stats[0]]
 				#print(bedfile_intersection_statistics)
 				intersection_statistics.append(bedfile_intersection_statistics)
-				unique_calls_shuffled.extend(unique_calls_shuffled_stats[1])				
-				
+				unique_calls_shuffled.extend(unique_calls_shuffled_stats[1])
+
 	for common_filter in common_filters: # Find variant calls for shared filters
 		original_sv_types = caller_original[common_filter].keys()
 		shuffled_sv_types = caller_shuffled[common_filter].keys()
 		sv_original_only = set(original_sv_types) - set(shuffled_sv_types)
 		sv_shuffled_only = set(shuffled_sv_types) - set(original_sv_types)
 		common_svs = set(original_sv_types) & set(shuffled_sv_types)
-		
+
 		for sv_type in sv_original_only:
 			warning_messages.add("SV Type: " + sv_type + " not found in shuffled vcf file")
 			unique_calls_original_stats = get_unique_filter_sv_type_statistics(caller_original, common_filter, sv_type)
 			bedfile_intersection_statistics = [common_filter, sv_type, 0, unique_calls_original_stats[0], 0]
 			#print(bedfile_intersection_statistics)
 			intersection_statistics.append(bedfile_intersection_statistics)
-			
+
 			unique_calls_original.extend(unique_calls_original_stats[1])
-		
+
 		for sv_type in sv_shuffled_only:
 			warning_messages.add("SV Type: " + sv_type + " not found in original vcf file")
 			unique_calls_shuffled_stats = get_unique_filter_sv_type_statistics(caller_shuffled, common_filter, sv_type)
 			bedfile_intersection_statistics = [common_filter, sv_type, 0, 0, unique_calls_shuffled_stats[0]]
 			#print(bedfile_intersection_statistics)
 			intersection_statistics.append(bedfile_intersection_statistics)
-			unique_calls_shuffled.extend(unique_calls_shuffled_stats[1])					
+			unique_calls_shuffled.extend(unique_calls_shuffled_stats[1])
 
 		for sv_type in common_svs:
 			bedfile_intersection = get_intersection_statistics(caller_original, caller_shuffled, common_filter, sv_type)
@@ -410,7 +470,7 @@ def compare_vcf_total_predictions_new(caller_shuffled, caller_original):
 			#print(bedfile_intersection[0])
 			intersection_statistics.append(bedfile_intersection[0])
 			if len(bedfile_intersection[1]) != 0:
-				unique_calls_original.extend(bedfile_intersection[1])			
+				unique_calls_original.extend(bedfile_intersection[1])
 			if len(bedfile_intersection[2]) != 0:
 				unique_calls_shuffled.extend(bedfile_intersection[2])
 
@@ -419,7 +479,7 @@ def compare_vcf_total_predictions_new(caller_shuffled, caller_original):
 	total_shuffled_only = sum([int(row[4]) for row in intersection_statistics[1:]])
 	intersection_statistics.append(["Total","ALL_SVS", total_intersection, total_original_only, total_shuffled_only])
 
-	return(intersection_statistics, unique_calls_original, unique_calls_shuffled)	
+	return(intersection_statistics, unique_calls_original, unique_calls_shuffled)
 
 if args.sv_caller.lower() == "pbsv":
 	with open(args.original_vcf) as f:
@@ -432,7 +492,7 @@ if args.sv_caller.lower() == "pbsv":
 
 		vcf_comparison_total_svs = compare_vcf_total_predictions_new(pbsv_shuffled, pbsv_original)
 		vcf_comparison_breakpoints = compare_vcf_breakpoints(pbsv_shuffled, pbsv_original)
-		
+
 		write_result_statistics(vcf_comparison_total_svs[0], vcf_comparison_breakpoints[0])
 		write_unique(vcf_comparison_total_svs[1], vcf_comparison_total_svs[2], vcf_comparison_breakpoints[1])
 
@@ -440,14 +500,14 @@ elif args.sv_caller.lower() == "svim":
 	with open(args.original_vcf) as f:
 		original_variants = f.readlines()
 		svim_original = parse_svim(original_variants)
-	
+
 	with open(args.shuffled_vcf) as f:
 		shuffled_variants = f.readlines()
 		svim_shuffled = parse_svim(shuffled_variants)
-	
+
 		vcf_comparison_total_svs = compare_vcf_total_predictions_new(svim_shuffled, svim_original)
 		vcf_comparison_breakpoints = compare_vcf_breakpoints(svim_shuffled, svim_original)
-		
+
 		write_result_statistics(vcf_comparison_total_svs[0], vcf_comparison_breakpoints[0])
 		write_unique(vcf_comparison_total_svs[1], vcf_comparison_total_svs[2], vcf_comparison_breakpoints[1])
 
@@ -455,13 +515,13 @@ elif args.sv_caller.lower() == "sniffles":
 	with open(args.original_vcf) as f:
 		original_variants = f.readlines()
 		sniffles_original = parse_sniffles(original_variants)
-	
+
 	with open(args.shuffled_vcf) as f:
 		shuffled_variants = f.readlines()
 		sniffles_shuffled = parse_sniffles(shuffled_variants)
-	
+
 		vcf_comparison_total_svs = compare_vcf_total_predictions_new(sniffles_shuffled, sniffles_original)
 		vcf_comparison_breakpoints = compare_vcf_breakpoints(sniffles_shuffled, sniffles_original)
-		
+
 		write_result_statistics(vcf_comparison_total_svs[0], vcf_comparison_breakpoints[0])
 		write_unique(vcf_comparison_total_svs[1], vcf_comparison_total_svs[2], vcf_comparison_breakpoints[1])
