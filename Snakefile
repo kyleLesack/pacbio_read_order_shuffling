@@ -494,7 +494,7 @@ rule compare_svim:
 		replicate = "|".join(["1","2","3","4","5"]),
 		svimqual = "|".join(["0","15"])
 	params:
-		originalnum = "3_variant_calls/full_depth/{aligner}/svim/{strain}/ORIGINAL/variants.vcf",
+		original = "3_variant_calls/full_depth/{aligner}/svim/{strain}/ORIGINAL/variants.vcf",
 		shuffled = "3_variant_calls/full_depth/{aligner}/svim/{strain}/{replicate}/variants.vcf",
 		quality = "{svimqual}"
 	conda:  "yaml/pybedtools.yaml"
@@ -515,7 +515,7 @@ rule compare_sniffles:
 		aligner = "|".join(SNIFFLES_SVIM_ALIGNERS),
 		replicate = "|".join(["1","2","3","4","5"]),
 	params:
-		originalnum = "3_variant_calls/full_depth/{aligner}/sniffles/{strain}/ORIGINAL/{strain}.vcf",
+		original = "3_variant_calls/full_depth/{aligner}/sniffles/{strain}/ORIGINAL/{strain}.vcf",
 		shuffled = "3_variant_calls/full_depth/{aligner}/sniffles/{strain}/{replicate}/{strain}.vcf"
 	conda:  "yaml/pybedtools.yaml"
 	resources:
@@ -535,7 +535,7 @@ rule compare_pbsv:
 		aligner = "|".join(PBSV_ALIGNERS),
 		replicate = "|".join(["1","2","3","4","5"]),
 	params:
-		originalnum = "3_variant_calls/full_depth/{aligner}/pbsv/{strain}/ORIGINAL/{strain}.vcf",
+		original = "3_variant_calls/full_depth/{aligner}/pbsv/{strain}/ORIGINAL/{strain}.vcf",
 		shuffled = "3_variant_calls/full_depth/{aligner}/pbsv/{strain}/{replicate}/{strain}.vcf"
 	conda:  "yaml/pybedtools.yaml"
 	resources:
@@ -774,7 +774,7 @@ rule compare_svim_subsampled:
 		replicate = "|".join(["1","2","3","4","5"]),
 		svimqual = "|".join(["0","15"])
 	params:
-		originalnum = "3_variant_calls/subsampled/{depth}X/{aligner}/svim/{strain}/ORIGINAL/variants.vcf",
+		original = "3_variant_calls/subsampled/{depth}X/{aligner}/svim/{strain}/ORIGINAL/variants.vcf",
 		shuffled = "3_variant_calls/subsampled/{depth}X/{aligner}/svim/{strain}/{replicate}/variants.vcf",
 		quality = "{svimqual}"
 	conda:  "yaml/pybedtools.yaml"
@@ -795,7 +795,7 @@ rule compare_sniffles_subsampled:
 		aligner = "|".join(SNIFFLES_SVIM_ALIGNERS),
 		replicate = "|".join(["1","2","3","4","5"]),
 	params:
-		originalnum = "3_variant_calls/subsampled/{depth}X/{aligner}/sniffles/{strain}/ORIGINAL/{strain}.vcf",
+		original = "3_variant_calls/subsampled/{depth}X/{aligner}/sniffles/{strain}/ORIGINAL/{strain}.vcf",
 		shuffled = "3_variant_calls/subsampled/{depth}X/{aligner}/sniffles/{strain}/{replicate}/{strain}.vcf"
 	conda:  "yaml/pybedtools.yaml"
 	resources:
@@ -815,7 +815,7 @@ rule compare_pbsv_subsampled:
 		aligner = "|".join(PBSV_ALIGNERS),
 		replicate = "|".join(["1","2","3","4","5"]),
 	params:
-		originalnum = "3_variant_calls/subsampled/{depth}X/{aligner}/pbsv/{strain}/ORIGINAL/{strain}.vcf",
+		original = "3_variant_calls/subsampled/{depth}X/{aligner}/pbsv/{strain}/ORIGINAL/{strain}.vcf",
 		shuffled = "3_variant_calls/subsampled/{depth}X/{aligner}/pbsv/{strain}/{replicate}/{strain}.vcf"
 	conda:  "yaml/pybedtools.yaml"
 	resources:
