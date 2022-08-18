@@ -5,6 +5,5 @@
 2_alignments/
 3_variant_calls/
 logs/
-old.Snakefile
-old/
 *.bak
+*.old
