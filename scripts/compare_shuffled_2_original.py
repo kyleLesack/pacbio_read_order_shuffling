@@ -403,7 +403,7 @@ def get_intersection_statistics(caller_original, caller_shuffled, sv_filter, sv_
 		bnd_calls_original_only = bnd_calls_original_set.difference(bnd_calls_shuffled_set)
 		bnd_calls_shuffled_only = bnd_calls_shuffled_set.difference(bnd_calls_original_set)
 		unique_call_count = len(bnd_calls_original_only) + len(bnd_calls_shuffled_only)
-		total_call_count = unique_call_count + len(bedfile_intersection)
+		total_call_count = unique_call_count + len(bnd_intersection)
 		unique_call_proportion = unique_call_count / total_call_count
 		bedfile_intersection_statistics = [sv_filter, sv_type, len(bnd_intersection), len(bnd_calls_original_only ), len(bnd_calls_shuffled_only), unique_call_count, unique_call_proportion]
 
