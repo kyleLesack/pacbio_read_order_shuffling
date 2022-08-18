@@ -1,9 +1,0 @@
-.gitignore
-.snakemake/
-0_input/data/
-1_fq_processing/
-2_alignments/
-3_variant_calls/
-logs/
-*.bak
-*.old
