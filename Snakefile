@@ -502,7 +502,7 @@ rule compare_svim:
 		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
 		time_hms="01:00:00"
 	shell:
-		"python3 scripts/compare_shuffled_2_original.py {params.shuffled} {params.originalnum} svim --minsize 0 --min_qual_svim {params.quality}"
+		"python3 scripts/compare_shuffled_2_original.py {params.shuffled} {params.original} svim --minsize 0 --min_qual_svim {params.quality}"
 
 rule compare_sniffles:
 	input:
@@ -522,7 +522,7 @@ rule compare_sniffles:
 		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
 		time_hms="01:00:00"
 	shell:
-		"python3 scripts/compare_shuffled_2_original.py {params.shuffled} {params.originalnum} sniffles --minsize 0"
+		"python3 scripts/compare_shuffled_2_original.py {params.shuffled} {params.original} sniffles --minsize 0"
 
 rule compare_pbsv:
 	input:
@@ -542,7 +542,7 @@ rule compare_pbsv:
 		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
 		time_hms="01:00:00"
 	shell:
-		"python3 scripts/compare_shuffled_2_original.py {params.shuffled} {params.originalnum} pbsv --minsize 0"
+		"python3 scripts/compare_shuffled_2_original.py {params.shuffled} {params.original} pbsv --minsize 0"
 
 rule concatenate_total_svs_sniffles:
 	input:
@@ -782,7 +782,7 @@ rule compare_svim_subsampled:
 		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
 		time_hms="01:00:00"
 	shell:
-		"python3 scripts/compare_shuffled_2_original.py {params.shuffled} {params.originalnum} svim --minsize 0 --min_qual_svim {params.quality}"
+		"python3 scripts/compare_shuffled_2_original.py {params.shuffled} {params.original} svim --minsize 0 --min_qual_svim {params.quality}"
 
 rule compare_sniffles_subsampled:
 	input:
@@ -802,7 +802,7 @@ rule compare_sniffles_subsampled:
 		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
 		time_hms="01:00:00"
 	shell:
-		"python3 scripts/compare_shuffled_2_original.py {params.shuffled} {params.originalnum} sniffles --minsize 0"
+		"python3 scripts/compare_shuffled_2_original.py {params.shuffled} {params.original} sniffles --minsize 0"
 
 rule compare_pbsv_subsampled:
 	input:
@@ -822,7 +822,7 @@ rule compare_pbsv_subsampled:
 		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
 		time_hms="01:00:00"
 	shell:
-		"python3 scripts/compare_shuffled_2_original.py {params.shuffled} {params.originalnum} pbsv --minsize 0"
+		"python3 scripts/compare_shuffled_2_original.py {params.shuffled} {params.original} pbsv --minsize 0"
 
 rule concatenate_total_svs_svim_qual15:
 	input:
