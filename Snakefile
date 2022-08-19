@@ -872,7 +872,7 @@ rule concatenate_total_breakpoints_svim_subsampled_qual15:
 rule summarize_svim_results_by_type:
 	input:
 		expand("3_variant_calls/{depth}/{aligner}/svim/{strain}/1/QUAL_15/summary/summary_total_svs.csv", depth = FULL_SUBSAMPLED_DEPTHS, aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS),
-		expand("3_variant_calls/{aligner}/svim/{strain}/1/QUAL_15/summary/summary_breakpoints.csv", depth = FULL_SUBSAMPLED_DEPTHS, aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS),
+		expand("3_variant_calls/{depth}/{aligner}/svim/{strain}/1/QUAL_15/summary/summary_breakpoints.csv", depth = FULL_SUBSAMPLED_DEPTHS, aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS),
 	output:
 		expand("4_results/{depth}/{analysis}/svim/qual_15/svim-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS)
 	resources:
@@ -884,7 +884,7 @@ rule summarize_svim_results_by_type:
 rule summarize_sniffles_results_by_type:
 	input:
 		expand("3_variant_calls/{depth}/{aligner}/sniffles/{strain}/1/summary/summary_total_svs.csv", depth = FULL_SUBSAMPLED_DEPTHS, aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS),
-		expand("3_variant_calls/{aligner}/sniffles/{strain}/1/summary/summary_breakpoints.csv", depth = FULL_SUBSAMPLED_DEPTHS, aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS),
+		expand("3_variant_calls/{depth}/{aligner}/sniffles/{strain}/1/summary/summary_breakpoints.csv", depth = FULL_SUBSAMPLED_DEPTHS, aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS),
 	output:
 		expand("4_results/{depth}/{analysis}/sniffles/sniffles-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS)
 	resources:
@@ -896,7 +896,7 @@ rule summarize_sniffles_results_by_type:
 rule summarize_pbsv_results_by_type:
 	input:
 		expand("3_variant_calls/{depth}/{aligner}/pbsv/{strain}/1/summary/summary_total_svs.csv", depth = FULL_SUBSAMPLED_DEPTHS, aligner = PBSV_ALIGNERS, strain = ALL_STRAINS),
-		expand("3_variant_calls/{aligner}/pbsv/{strain}/1/summary/summary_breakpoints.csv", depth = FULL_SUBSAMPLED_DEPTHS, aligner = PBSV_ALIGNERS, strain = ALL_STRAINS),
+		expand("3_variant_calls/{depth}/{aligner}/pbsv/{strain}/1/summary/summary_breakpoints.csv", depth = FULL_SUBSAMPLED_DEPTHS, aligner = PBSV_ALIGNERS, strain = ALL_STRAINS),
 	output:
 		expand("4_results/{depth}/{analysis}/pbsv/pbsv-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = PBSV_ALIGNERS, strain = ALL_STRAINS)
 	resources:
