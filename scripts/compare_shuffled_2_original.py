@@ -394,6 +394,8 @@ def get_intersection_statistics(caller_original, caller_shuffled, sv_filter, sv_
 		unique_call_count = len(original_only_bedfile) + len(shuffled_only_bedfile)
 		total_call_count = unique_call_count + len(bedfile_intersection)
 		unique_call_proportion = unique_call_count / total_call_count
+		if unique_call_proportion > 1:
+			print("Exceeded 1 for unique call proportion")
 		bedfile_intersection_statistics = [sv_filter, sv_type, len(bedfile_intersection), len(original_only_bedfile), len(shuffled_only_bedfile), unique_call_count,unique_call_proportion]
 
 	else:
@@ -405,6 +407,8 @@ def get_intersection_statistics(caller_original, caller_shuffled, sv_filter, sv_
 		unique_call_count = len(bnd_calls_original_only) + len(bnd_calls_shuffled_only)
 		total_call_count = unique_call_count + len(bnd_intersection)
 		unique_call_proportion = unique_call_count / total_call_count
+		if unique_call_proportion > 1:
+			print("Exceeded 1 for unique call proportion")
 		bedfile_intersection_statistics = [sv_filter, sv_type, len(bnd_intersection), len(bnd_calls_original_only ), len(bnd_calls_shuffled_only), unique_call_count, unique_call_proportion]
 
 		for line in bnd_calls_original_only:
@@ -476,8 +480,6 @@ def compare_vcf_total_predictions_new(caller_shuffled, caller_original):
 
 		for sv_type in common_svs:
 			bedfile_intersection = get_intersection_statistics(caller_original, caller_shuffled, common_filter, sv_type)
-			#print("Here common")
-			#print(bedfile_intersection[0])
 			intersection_statistics.append(bedfile_intersection[0])
 			if len(bedfile_intersection[1]) != 0:
 				unique_calls_original.extend(bedfile_intersection[1])
@@ -488,7 +490,7 @@ def compare_vcf_total_predictions_new(caller_shuffled, caller_original):
 	total_original_only = sum([int(row[3]) for row in intersection_statistics[1:]])
 	total_shuffled_only = sum([int(row[4]) for row in intersection_statistics[1:]])
 	total_unique = sum([int(row[5]) for row in intersection_statistics[1:]])
-	total_unique_proportion = total_unique / total_intersection
+	total_unique_proportion = total_unique /  (total_unique + total_intersection)
 	intersection_statistics.append(["Total","ALL_SVS", total_intersection, total_original_only, total_shuffled_only, total_unique, total_unique_proportion])
 
 	return(intersection_statistics, unique_calls_original, unique_calls_shuffled)
