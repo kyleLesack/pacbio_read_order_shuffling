@@ -22,7 +22,7 @@ intersection.df <- rbind(pbsv_pbmm2.df, sniffles_minimap2.df, sniffles_ngmlr.df,
 col_order <- c("Aligner", "Caller", "Agreement", "Count")
 intersection_reordered.df <- intersection.df[, col_order]
 intersection_reordered.df <- intersection_reordered.df[- grep("Non-Overlapping", intersection_reordered.df$Agreement),]
-intersection_reordered.df <- intersection_reordered.df[- grep("Total_SVs", intersection_reordered.df$Agreement),]
+#intersection_reordered.df <- intersection_reordered.df[- grep("Total_SVs", intersection_reordered.df$Agreement),]
 intersection_reordered.df <- intersection_reordered.df %>% mutate_all(funs(str_replace(., "Intersection", "Intersecting calls")))
 intersection_reordered.df <- intersection_reordered.df %>% mutate_all(funs(str_replace(., "Unique", "Unique calls")))
 intersection_reordered.df <- intersection_reordered.df %>% mutate_all(funs(str_replace(., "sniffles", "Sniffles")))
@@ -41,5 +41,4 @@ ggsave("1_sv_agreement.png", plot = p, device = "png", path = "5_plots/full_dept
 p2 <- ggplot(intersection_reordered.df, aes(x=Caller, y = Count, fill=Agreement, group = Agreement)) + geom_col( position=position_dodge()) + facet_grid(~ Aligner, scales = "free_x", space = "free_x", switch = "x")
 p2 <- p2 + xlab("SV Calling and Alignment Method") + ggtitle("Intersection of Predicted Structural Variants") + theme(plot.title = element_text(hjust = 0.5)) + geom_text(aes(x=Caller, y = Count, label = Count, group = Agreement), position = position_dodge(width = 1),vjust = -0.5, size = 2.5)
 ggsave("1_sv_agreement-counts.png", plot = p2, device = "png", path = "5_plots/full_depth", scale = 1, dpi = 300, limitsize = TRUE, width = 2605, height = 1715, units = "px")
-
 

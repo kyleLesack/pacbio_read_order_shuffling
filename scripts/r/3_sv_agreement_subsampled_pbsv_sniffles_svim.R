@@ -21,9 +21,7 @@ col_order <- c("Depth", "Aligner", "Agreement",  "Count")
 nooverlap_sniffles_reordered.df <- nooverlap_sniffles.df[, col_order]
 nooverlap_sniffles_reordered.df <- nooverlap_sniffles_reordered.df[- grep("Intersection", nooverlap_sniffles_reordered.df$Agreement),]
 nooverlap_sniffles_reordered.df <- nooverlap_sniffles_reordered.df[- grep("Unique", nooverlap_sniffles_reordered.df$Agreement),]
-nooverlap_sniffles_reordered.df <- nooverlap_sniffles_reordered.df[- grep("Total_SVs", nooverlap_sniffles_reordered.df$Agreement),]
-
-
+nooverlap_sniffles_reordered.df
 #ggplot(nooverlap_sniffles_reordered.df, aes(x=Depth, y = Count, fill=Aligner)) + geom_col( position=position_dodge())
 p_sniffles <- ggplot(nooverlap_sniffles_reordered.df, aes(x=Depth, y = Count)) + geom_col( position=position_dodge()) + facet_grid(~ Aligner, scales = "free_x", space = "free_x", switch = "x") + ylim(0, 100)
 p_sniffles <- p_sniffles + xlab("Sniffles") + ylab("Non-Overlapping SV Calls (%)")
@@ -47,7 +45,7 @@ col_order <- c("Depth", "Aligner", "Agreement",  "Count")
 nooverlap_svim_reordered.df <- nooverlap_svim.df[, col_order]
 nooverlap_svim_reordered.df <- nooverlap_svim_reordered.df[- grep("Intersection", nooverlap_svim_reordered.df$Agreement),]
 nooverlap_svim_reordered.df <- nooverlap_svim_reordered.df[- grep("Unique", nooverlap_svim_reordered.df$Agreement),]
-nooverlap_svim_reordered.df <- nooverlap_svim_reordered.df[- grep("Total_SVs", nooverlap_svim_reordered.df$Agreement),]
+#nooverlap_svim_reordered.df <- nooverlap_svim_reordered.df[- grep("Total_SVs", nooverlap_svim_reordered.df$Agreement),]
 
 #ggplot(nooverlap_svim_reordered.df, aes(x=Depth, y = Count, fill=Aligner)) + geom_col( position=position_dodge())
 p_svim <- ggplot(nooverlap_svim_reordered.df, aes(x=Depth, y = Count)) + geom_col( position=position_dodge()) + facet_grid(~ Aligner, scales = "free_x", space = "free_x", switch = "x") + ylim(0, 100)
@@ -64,7 +62,7 @@ col_order <- c("Depth", "Aligner", "Agreement",  "Count")
 nooverlap_pbsv_reordered.df <- nooverlap_pbsv.df[, col_order]
 nooverlap_pbsv_reordered.df <- nooverlap_pbsv_reordered.df[- grep("Intersection", nooverlap_pbsv_reordered.df$Agreement),]
 nooverlap_pbsv_reordered.df <- nooverlap_pbsv_reordered.df[- grep("Unique", nooverlap_pbsv_reordered.df$Agreement),]
-nooverlap_pbsv_reordered.df <- nooverlap_pbsv_reordered.df[- grep("Total_SVs", nooverlap_pbsv_reordered.df$Agreement),]
+#nooverlap_pbsv_reordered.df <- nooverlap_pbsv_reordered.df[- grep("Total_SVs", nooverlap_pbsv_reordered.df$Agreement),]
 
 p_pbsv <- ggplot(nooverlap_pbsv_reordered.df, aes(x=Depth, y = Count)) + geom_col( position=position_dodge()) + facet_grid(~ Aligner, scales = "free_x", space = "free_x", switch = "x") + ylim(0, 100)
 p_pbsv <- p_pbsv + xlab("pbsv") + ylab("Non-Overlapping SV Calls (%)")

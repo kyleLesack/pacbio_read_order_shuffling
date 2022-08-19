@@ -36,11 +36,9 @@ sniffles_ngmlr_60X.df <- read.delim(file = '4_results/subsampled/60X/breakpoint_
 sniffles_pbmm2_60X.df <- read.delim(file = '4_results/subsampled/60X/breakpoint_agreement/sniffles/ggplot/sniffles-pbmm2.csv', sep = ',',stringsAsFactors= TRUE, header = TRUE)
 
 sniffles_discordance.df <- rbind(sniffles_minimap2_10X.df, sniffles_minimap2_20X.df, sniffles_minimap2_40X.df, sniffles_minimap2_60X.df,sniffles_ngmlr_10X.df, sniffles_ngmlr_20X.df, sniffles_ngmlr_40X.df, sniffles_ngmlr_60X.df,sniffles_pbmm2_10X.df, sniffles_pbmm2_20X.df, sniffles_pbmm2_40X.df, sniffles_pbmm2_60X.df)
-sniffles_discordance.df
 col_order <- c("Depth", "Aligner", "Agreement",  "Count")
 sniffles_discordance_reordered.df <- sniffles_discordance.df[, col_order]
 sniffles_discordance_reordered.df <- sniffles_discordance_reordered.df[- grep("breakpoints", sniffles_discordance_reordered.df$Agreement),]
-sniffles_discordance_reordered.df
 
 #ggplot(sniffles_discordance_reordered.df, aes(x=Depth, y = Count, fill=Aligner)) + geom_col( position=position_dodge())
 p_sniffles <- ggplot(sniffles_discordance_reordered.df, aes(x=Depth, y = Count)) + geom_col( position=position_dodge()) + facet_grid(~ Aligner, scales = "free_x", space = "free_x", switch = "x") + ylim(0, 100)
