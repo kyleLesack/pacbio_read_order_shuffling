@@ -70,21 +70,22 @@ rule all:
 		expand("4_results/{depth}/{analysis}/svim/qual_15/svim-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS),
 		expand("4_results/{depth}/{analysis}/sniffles/sniffles-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS),
 		expand("4_results/{depth}/{analysis}/pbsv/pbsv-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = PBSV_ALIGNERS),
-		expand("4_results/{depth}/{analysis}/svim/qual_15/totals/svim-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS),
-		expand("4_results/{depth}/{analysis}/sniffles/totals/sniffles-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS),
-		expand("4_results/{depth}/{analysis}/pbsv/totals/pbsv-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = PBSV_ALIGNERS),
+		#expand("4_results/{depth}/{analysis}/svim/qual_15/totals/svim-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS),
+		#expand("4_results/{depth}/{analysis}/sniffles/totals/sniffles-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS),
+		#expand("4_results/{depth}/{analysis}/pbsv/totals/pbsv-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = PBSV_ALIGNERS),
 		expand("4_results/{depth}/{analysis}/svim/qual_15/ggplot/svim-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS),
 		expand("4_results/{depth}/{analysis}/sniffles/ggplot/sniffles-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS),
 		expand("4_results/{depth}/{analysis}/pbsv/ggplot/pbsv-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = PBSV_ALIGNERS),
 		"5_plots/full_depth/1_sv_agreement.png",
-		"5_plots/full_depth/2_breakpoint_agreement-counts.png",
-		"5_plots/full_depth/2_breakpoint_agreement.png",
 		"5_plots/full_depth/1_sv_agreement-counts.png",
+		"5_plots/full_depth/2_breakpoint_agreement.png",
+		"5_plots/full_depth/2_breakpoint_agreement-counts.png",
 		"5_plots/subsampled/3_sv_agreement_sniffles_svim_subsampled.png",
-		"5_plots/subsampled/4_breakpoint_agreement_sniffles_svim_pbsv_subsampled.png",
 		"5_plots/subsampled/3_sv_agreement_pbsv_sniffles_svim_subsampled.png",
-		"5_plots/subsampled/4_breakpoint_agreement_sniffles_svim_pbsv_subsampled-counts.png",
-		"5_plots/subsampled/3_sv_agreement_pbsv_sniffles_svim_subsampled_counts.png"
+		"5_plots/subsampled/3_sv_agreement_pbsv_sniffles_svim_subsampled_counts.png",
+		"5_plots/subsampled/4_breakpoint_agreement_sniffles_svim_pbsv_subsampled.png",
+		"5_plots/subsampled/4_breakpoint_agreement_sniffles_svim_pbsv_subsampled-counts.png"
+
 rule shuffle:
 	input:
 		"0_input/data/{strain}_all_reads.fastq"
@@ -905,41 +906,41 @@ rule summarize_pbsv_results_by_type:
 	shell:
 		"python3 scripts/summarize_results_by_type/1_summarize_by_sv_type.py"
 
-rule summarize_svim_results_by_type_add_totals:
-	input:
-		expand("4_results/{depth}/{analysis}/svim/qual_15/svim-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS)
-	output:
-		expand("4_results/{depth}/{analysis}/svim/qual_15/totals/svim-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS)
-	conda:  "yaml/pandas.yaml"
-	resources:
-		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
-		time_hms="00:10:00"
-	shell:
-		"python3 scripts/summarize_results_by_type/2_add_totals.py"
+#rule summarize_svim_results_by_type_add_totals:
+#	input:
+#		expand("4_results/{depth}/{analysis}/svim/qual_15/svim-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS)
+#	output:
+#		expand("4_results/{depth}/{analysis}/svim/qual_15/totals/svim-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS)
+#	conda:  "yaml/pandas.yaml"
+#	resources:
+#		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
+#		time_hms="00:10:00"
+#	shell:
+#		"python3 scripts/summarize_results_by_type/2_add_totals.py"
 
-rule summarize_sniffles_results_by_type_add_totals:
-	input:
-		expand("4_results/{depth}/{analysis}/sniffles/sniffles-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS)
-	output:
-		expand("4_results/{depth}/{analysis}/sniffles/totals/sniffles-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS)
-	conda:  "yaml/pandas.yaml"
-	resources:
-		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
-		time_hms="00:10:00"
-	shell:
-		"python3 scripts/summarize_results_by_type/2_add_totals.py"
+#rule summarize_sniffles_results_by_type_add_totals:
+#	input:
+#		expand("4_results/{depth}/{analysis}/sniffles/sniffles-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS)
+#	output:
+#		expand("4_results/{depth}/{analysis}/sniffles/totals/sniffles-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS)
+#	conda:  "yaml/pandas.yaml"
+#	resources:
+#		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
+#		time_hms="00:10:00"
+#	shell:
+#		"python3 scripts/summarize_results_by_type/2_add_totals.py"
 
-rule summarize_pbsv_results_by_type_add_totals:
-	input:
-		expand("4_results/{depth}/{analysis}/pbsv/pbsv-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = PBSV_ALIGNERS, strain = ALL_STRAINS)
-	output:
-		expand("4_results/{depth}/{analysis}/pbsv/totals/pbsv-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = PBSV_ALIGNERS, strain = ALL_STRAINS)
-	conda:  "yaml/pandas.yaml"
-	resources:
-		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
-		time_hms="00:10:00"
-	shell:
-		"python3 scripts/summarize_results_by_type/2_add_totals.py"
+#rule summarize_pbsv_results_by_type_add_totals:
+#	input:
+#		expand("4_results/{depth}/{analysis}/pbsv/pbsv-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = PBSV_ALIGNERS, strain = ALL_STRAINS)
+#	output:
+#		expand("4_results/{depth}/{analysis}/pbsv/totals/pbsv-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = PBSV_ALIGNERS, strain = ALL_STRAINS)
+#	conda:  "yaml/pandas.yaml"
+#	resources:
+#		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
+#		time_hms="00:10:00"
+#	shell:
+#		"python3 scripts/summarize_results_by_type/2_add_totals.py"
 
 rule summarize_svim_results_by_type_create_data4ggplot:
 	input:
@@ -951,31 +952,55 @@ rule summarize_svim_results_by_type_create_data4ggplot:
 		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
 		time_hms="00:10:00"
 	shell:
-		"python3 scripts/summarize_results_by_type/3_create_ggplot_data.py"
+		"python3 scripts/summarize_results_by_type/2_create_ggplot_data.py"
 
 rule summarize_sniffles_results_by_type_create_data4ggplot:
-	input:
-		expand("4_results/{depth}/{analysis}/sniffles/sniffles-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS)
-	output:
-		expand("4_results/{depth}/{analysis}/sniffles/ggplot/sniffles-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS)
-	conda:  "yaml/pandas.yaml"
-	resources:
-		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
-		time_hms="00:10:00"
-	shell:
-		"python3 scripts/summarize_results_by_type/3_create_ggplot_data.py"
+        input:
+                expand("4_results/{depth}/{analysis}/sniffles/sniffles-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS)
+        output:
+                expand("4_results/{depth}/{analysis}/sniffles/ggplot/sniffles-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS)
+        conda:  "yaml/pandas.yaml"
+        resources:
+                mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
+                time_hms="00:10:00"
+        shell:
+                "python3 scripts/summarize_results_by_type/2_create_ggplot_data.py"
 
 rule summarize_pbsv_results_by_type_create_data4ggplot:
-	input:
-		expand("4_results/{depth}/{analysis}/pbsv/pbsv-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = PBSV_ALIGNERS, strain = ALL_STRAINS)
-	output:
-		expand("4_results/{depth}/{analysis}/pbsv/ggplot/pbsv-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = PBSV_ALIGNERS, strain = ALL_STRAINS)
-	conda:  "yaml/pandas.yaml"
-	resources:
-		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
-		time_hms="00:10:00"
-	shell:
-		"python3 scripts/summarize_results_by_type/3_create_ggplot_data.py"
+        input:
+                expand("4_results/{depth}/{analysis}/pbsv/pbsv-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = PBSV_ALIGNERS, strain = ALL_STRAINS)
+        output:
+                expand("4_results/{depth}/{analysis}/pbsv/ggplot/pbsv-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = PBSV_ALIGNERS, strain = ALL_STRAINS)
+        conda:  "yaml/pandas.yaml"
+        resources:
+                mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
+                time_hms="00:10:00"
+        shell:
+                "python3 scripts/summarize_results_by_type/2_create_ggplot_data.py"
+
+#rule summarize_sniffles_results_by_type_create_data4ggplot:
+#	input:
+#		expand("4_results/{depth}/{analysis}/sniffles/sniffles-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS)
+#	output:
+#		expand("4_results/{depth}/{analysis}/sniffles/ggplot/sniffles-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS)
+#	conda:  "yaml/pandas.yaml"
+#	resources:
+#		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
+#		time_hms="00:10:00"
+#	shell:
+#		"python3 scripts/summarize_results_by_type/3_create_ggplot_data.py"
+
+#rule summarize_pbsv_results_by_type_create_data4ggplot:
+#	input:
+#		expand("4_results/{depth}/{analysis}/pbsv/pbsv-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = PBSV_ALIGNERS, strain = ALL_STRAINS)
+#	output:
+#		expand("4_results/{depth}/{analysis}/pbsv/ggplot/pbsv-{aligner}.csv", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = PBSV_ALIGNERS, strain = ALL_STRAINS)
+#	conda:  "yaml/pandas.yaml"
+#	resources:
+#		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
+#		time_hms="00:10:00"
+#	shell:
+#		"python3 scripts/summarize_results_by_type/3_create_ggplot_data.py"
 
 rule r_plot_sv_agreement:
 	input:
