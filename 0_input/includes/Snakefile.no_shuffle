@@ -23,7 +23,7 @@ rule pbmm2_original:
 	input:
 		"0_input/data/{strain}_all_reads.fastq"
 	output:
-		"2_alignments/pbmm2/{strain}/ORIGINAL/{strain}.bam"
+		"2_alignments/pbmm2/{strain}/ORIGINAL/{strain}_sorted.bam"
 	conda:  "../../yaml/pbmm2.yaml"
 	threads: 8
 	resources:
@@ -105,7 +105,7 @@ rule getbamdepth_original:
 
 rule pbsvdiscover_original:
 	input:
-		"2_alignments/{aligner}/{strain}/ORIGINAL/{strain}.bam"
+		"2_alignments/{aligner}/{strain}/ORIGINAL/{strain}_sorted.bam"
 	output:
 		temp("3_variant_calls/full_depth/{aligner}/{strain}/ORIGINAL/{strain}.svsig.gz")
 	wildcard_constraints:

@@ -62,12 +62,12 @@ def parse_pbsv(pbsv_variants):
 						callerDict[filter_line][variant_type].append(bed_line)
 					else:
 						print("Excluding: " + line)
-						if variant_type not in pbsv_SV_TYPES:
+						if variant_type not in PBSV_SV_TYPES:
 							print("Invalid variant type: " + variant_type)
 						#if variant_qual < args.min_qual_pbsv:
 						#	print("pbsv Qual too low: " + variant_qual)
-						if abs_variant_size_from_coords < args.minsize:
-							print("Variant too small: " + str(abs_variant_size_from_coords))
+						if abs_variant_size < args.minsize:
+							print("Variant too small: " + str(abs_variant_size))
 				else:
 					#if variant_qual >= args.min_qual_pbsv:
 					end_coord = line_split[4]
