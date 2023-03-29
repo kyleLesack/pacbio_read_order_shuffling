@@ -62,7 +62,7 @@ rule pbmm2:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
 		time="06:00:00"
 	shell:
-		"pbmm2 align  -j {threads} {REFERENCE_SAW} {input} {output} --sort --median-filter --sample {wildcards.strain}  --rg '@RG\tID:myid\tSM:{wildcards.strain}'"
+		"pbmm2 align  -j {threads} {REFERENCE} {input} {output} --sort --median-filter --sample {wildcards.strain}  --rg '@RG\tID:myid\tSM:{wildcards.strain}'"
 
 # Align FASTQ files using NGMLR
 rule ngmlr:
@@ -171,7 +171,7 @@ rule pbsvcall:
 		mem_mb=lambda _, attempt: 50000 + ((attempt - 1) * 10000),
 		time="08:00:00"
 	shell:
-		"pbsv call -j 8 {REFERENCE_SAW} {input} {output}"
+		"pbsv call -j 8 {REFERENCE} {input} {output}"
 
 # Call SVs with SVIM
 rule svim:
