@@ -9,7 +9,7 @@ PBSV_ALIGNERS = ["pbmm2"]
 SVIM_QUAL =["0"] # SVIM quality filter. Set to a higher value to filter out less confident SV calls
 
 FULL_SUBSAMPLED_DEPTHS = ["full_depth", "subsampled/10X", "subsampled/20X", "subsampled/40X", "subsampled/60X"]
-#SUBSAMPLED_DEPTHS = ["10X", "20X", "40X", "60X"]
+SUBSAMPLED_DEPTHS = ["10X", "20X", "40X", "60X"]
 COMPARISON_SUMMARY_FILES = ["summary/overlap_comparison_all_svs.csv", "unique/non_intersecting_all_svs.csv", "summary/overlap_comparison_coords_all_svs.csv", "unique/non_intersecting_coords_all_svs.csv", "summary/overlap_comparison_relaxed_all_svs.csv", "unique/non_intersecting_relaxed_all_svs.csv"]
 OVERLAP_SUMMARY_FILES = ['agreement_summary_total.csv', 'agreement_summary_coords_total.csv', 'agreement_summary_relaxed_total.csv']
 SUBAMPLED_COMBINED_LONG_TABLE_FILES = ["total.csv", "coords_total.csv", "relaxed_total.csv"]
