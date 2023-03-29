@@ -237,7 +237,7 @@ rule pbmm2_subsampled:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
 		time="06:00:00"
 	shell:
-		"pbmm2 align  -j {threads} {REFERENCE_SAW} {input} {output} --sort --median-filter --sample {wildcards.strain}  --rg '@RG\tID:myid\tSM:{wildcards.strain}'"
+		"pbmm2 align  -j {threads} {REFERENCE} {input} {output} --sort --median-filter --sample {wildcards.strain}  --rg '@RG\tID:myid\tSM:{wildcards.strain}'"
 
 # Align subsampled FASTQ files using NGMLR
 rule ngmlr_subsampled:
