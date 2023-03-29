@@ -18,7 +18,7 @@ Note: The ./yaml directory include conda yaml environment files. I recommend usi
 	* [pbmm2](https://github.com/PacificBiosciences/pbmm2) (v.1.7.0)
 * SV Callers
 	* [pbsv](https://github.com/PacificBiosciences/pbsv) (v2.8.0)
-	* [Sniffles](https://github.com/fritzsedlazeck/Sniffles) (v2.0.6)
+	* [Sniffles](https://github.com/fritzsedlazeck/Sniffles) (v2.0.7)
 	* [SVIM](https://github.com/eldariont/svim) (v2.0.0)
 
 ## Data Not Included Here
