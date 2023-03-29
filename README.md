@@ -6,10 +6,11 @@ These scripts were used to evaluate the impact of FASTQ file read order on struc
 
 Note: The ./yaml directory include conda yaml environment files. I recommend using conda to install the required software using these files. The required tools and the versions we tested are listed below:
 
-* [Snakemake](https://snakemake.readthedocs.io/en/stable/) (v.)
+* [Snakemake](https://snakemake.readthedocs.io/en/stable/) (v.7.25.0)
 * [Picard Tools](https://broadinstitute.github.io/picard/) (v.2.27.5)
 * [SAMtools](http://www.htslib.org/) (v1.9)
 	* Note: SAMTools >= v1.10 didn't work with the NGMLR alignments
+* [pybedtools](https://daler.github.io/pybedtools/) (v.0.9.0)
 * [seq-shuff](https://github.com/thackl/seq-scripts/blob/master/bin/seq-shuf)
 * Aligners
 	* [Minimap2](https://github.com/lh3/minimap2) (v.2.17)
