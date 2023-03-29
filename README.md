@@ -15,7 +15,7 @@ Note: The ./yaml directory include conda yaml environment files. I recommend usi
 * Aligners
 	* [Minimap2](https://github.com/lh3/minimap2) (v.2.17)
 	* [NGMLR](https://github.com/philres/ngmlr) (v.0.2.7)
-	* [pbmm2](https://github.com/PacificBiosciences/pbmm2) (v.1.7.0)
+	* [pbmm2](https://github.com/PacificBiosciences/pbmm2) (v.1.9.0)
 * SV Callers
 	* [pbsv](https://github.com/PacificBiosciences/pbsv) (v2.8.0)
 	* [Sniffles](https://github.com/fritzsedlazeck/Sniffles) (v2.0.7)
