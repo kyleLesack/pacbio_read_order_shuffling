@@ -219,7 +219,7 @@ rule compare_svim:
 	output:
 		expand("3_variant_calls/{depth}/{aligner}/svim/{strain}/shuffled/qual_{svim_qual}/{summaryfile}", summaryfile=COMPARISON_SUMMARY_FILES, allow_missing=True)
 	params:
-		quality = "{svim_qual}"
+		quality = "{svim_qual}",
 		minsize="100",
 		reciprocal="0.5"
 	conda:  "yaml/pybedtools.yaml"
