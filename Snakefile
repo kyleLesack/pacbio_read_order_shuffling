@@ -1,12 +1,12 @@
 include: "0_input/includes/Snakefile.subsample.py"
 ALL_STRAINS = ["XZ1516", "N2"] # Use two isolates to run the pipeline more quickly
-#ALL_STRAINS = ["JU1400", "NIC2", "JU2526", "XZ1516", "MY2693", "QX1794", "NIC526", "DRR142768", "DL238","ECA396","JU2600","ECA36","EG4725","MY2147","JU310"]
+#ALL_STRAINS = ["JU1400", "NIC2", "JU2526", "XZ1516", "MY2693", "QX1794", "NIC526", "N2", "DL238","ECA396","JU2600","ECA36","EG4725","MY2147","JU310"]
 READORDER = ["shuffled","original"]
 REFERENCE = "0_input/reference/c_elegans.PRJNA13758.WS263.genomic.fa" # C. elegans reference genome
 SAM_ALIGNERS = ["ngmlr","minimap2"] # Aligners that output sam files
 SNIFFLES_SVIM_ALIGNERS = ["minimap2", "ngmlr", "pbmm2"]
 PBSV_ALIGNERS = ["pbmm2"]
-SVIM_QUAL =["0"] # SVIM quality filter. Set to a higher value to filter out less confident SV calls
+SVIM_QUAL =["0"] # SVIM quality filter. Add higher values to list to evaluate how FASTQ read order affects SV calling in SVIM with more stringent filtering threshold(s)
 
 FULL_SUBSAMPLED_DEPTHS = ["full_depth", "subsampled/10X", "subsampled/20X", "subsampled/40X", "subsampled/60X"]
 SUBSAMPLED_DEPTHS = ["10X", "20X", "40X", "60X"]
@@ -26,9 +26,9 @@ rule all:
 		expand("3_variant_calls/{depth}/{aligner}/svim/{strain}/shuffled/qual_{svim_qual}/{summaryfile}", depth=FULL_SUBSAMPLED_DEPTHS, aligner=SNIFFLES_SVIM_ALIGNERS, strain=ALL_STRAINS, svim_qual=SVIM_QUAL, summaryfile=COMPARISON_SUMMARY_FILES),
 		expand("3_variant_calls/{depth}/{aligner}/sniffles/{strain}/shuffled/{summaryfile}",depth=FULL_SUBSAMPLED_DEPTHS, aligner=SNIFFLES_SVIM_ALIGNERS, strain=ALL_STRAINS, summaryfile=COMPARISON_SUMMARY_FILES),
 		expand("3_variant_calls/{depth}/{aligner}/pbsv/{strain}/shuffled/{summaryfile}",depth=FULL_SUBSAMPLED_DEPTHS, aligner=PBSV_ALIGNERS, strain=ALL_STRAINS, summaryfile=COMPARISON_SUMMARY_FILES),
-		#expand("4_results/{depth}/sv_intersection_agreement/svim/qual_{svim_qual}/svim-{aligner}_{resultsuffix}", depth = FULL_SUBSAMPLED_DEPTHS, svim_qual=SVIM_QUAL, aligner = SNIFFLES_SVIM_ALIGNERS, resultsuffix=OVERLAP_SUMMARY_FILES),
-		#expand("4_results/{depth}/sv_intersection_agreement/sniffles/sniffles-{aligner}_{resultsuffix}", depth = FULL_SUBSAMPLED_DEPTHS, aligner = SNIFFLES_SVIM_ALIGNERS, resultsuffix=OVERLAP_SUMMARY_FILES),
-		#expand("4_results/{depth}/sv_intersection_agreement/pbsv/pbsv-{aligner}_{resultsuffix}", depth = FULL_SUBSAMPLED_DEPTHS, aligner = PBSV_ALIGNERS, resultsuffix=OVERLAP_SUMMARY_FILES),
+		expand("4_results/{depth}/sv_intersection_agreement/svim/qual_{svim_qual}/svim-{aligner}_{resultsuffix}", depth = FULL_SUBSAMPLED_DEPTHS, svim_qual=SVIM_QUAL, aligner = SNIFFLES_SVIM_ALIGNERS, resultsuffix=OVERLAP_SUMMARY_FILES),
+		expand("4_results/{depth}/sv_intersection_agreement/sniffles/sniffles-{aligner}_{resultsuffix}", depth = FULL_SUBSAMPLED_DEPTHS, aligner = SNIFFLES_SVIM_ALIGNERS, resultsuffix=OVERLAP_SUMMARY_FILES),
+		expand("4_results/{depth}/sv_intersection_agreement/pbsv/pbsv-{aligner}_{resultsuffix}", depth = FULL_SUBSAMPLED_DEPTHS, aligner = PBSV_ALIGNERS, resultsuffix=OVERLAP_SUMMARY_FILES),
 		#expand("4_results/subsampled/combined/sv_intersection_agreement/pbsv/combined_long_table/pbsv-{aligner}_agreement_summary_{analysis}", aligner = PBSV_ALIGNERS, analysis = SUBAMPLED_COMBINED_LONG_TABLE_FILES),
 		#expand("4_results/subsampled/combined/sv_intersection_agreement/sniffles/combined_long_table/sniffles-{aligner}_agreement_summary_{analysis}", aligner = SNIFFLES_SVIM_ALIGNERS, analysis = SUBAMPLED_COMBINED_LONG_TABLE_FILES),
 		#expand("4_results/subsampled/combined/sv_intersection_agreement/svim/qual_{svim_qual}/combined_long_table/svim-{aligner}_agreement_summary_{analysis}", svim_qual = SVIM_QUAL, aligner = SNIFFLES_SVIM_ALIGNERS, analysis = SUBAMPLED_COMBINED_LONG_TABLE_FILES),

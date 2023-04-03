@@ -20,14 +20,12 @@ parser.add_argument("outputpath", help="Directory to write results to")
 parser.add_argument('--svim_qual', default='15', help="SVIM qual value")
 args = parser.parse_args()
 
-ALL_STRAINS = ["JU1400", "NIC2", "JU2526", "XZ1516", "MY2693", "QX1794", "NIC526", "DRR142768", "DL238","ECA396","JU2600","ECA36","EG4725","MY2147","JU310"]
+ALL_STRAINS = ["JU1400", "NIC2", "JU2526", "XZ1516", "MY2693", "QX1794", "NIC526", "N2", "DL238","ECA396","JU2600","ECA36","EG4725","MY2147","JU310"]
 SNIFFLES_SVIM_ALIGNERS = ["minimap2", "ngmlr", "pbmm2"]
 PBSV_ALIGNERS = ["pbmm2"]
 PBSV_SV_TYPES = ["BND", "DEL", "DUP", "INS","INV","ALL_SVS"]
 SNIFFLES_SV_TYPES = ["BND", "DEL", "DUP", "INS","INV","ALL_SVS"]
 SVIM_SV_TYPES = ["BND", "DEL", "DUP:INT","DUP:TANDEM", "INS","INV","ALL_SVS"]
-
-#SUBSAMPLE_DEPTHS = ["10X","20X","40X","60X"]
 
 SV_INTERSECTION_HEADER = "SV TYPE,Intersection,Original only,Shuffled only,Unique,Unique proportion"
 OVERLAP_SUMMARY_HEADER = "SV TYPE,Total calls,Intersection,Non-intersecting,Non-intersecting proportion"
@@ -149,7 +147,7 @@ def get_agreement_summary(caller,caller_csv_path, aligners, caller_sv_types, inp
 				mean_shuffled_only = statistics.mean(shuffled_only_values)
 				mean_unique = statistics.mean(unique_values)
 				mean_unique_proportion = statistics.mean(unique_proportion_values)
-				summary_line =f'{mean_intersection:.2f},{mean_original_only:.2f},{mean_shuffled_only:.2f},{mean_unique:.2f},{mean_unique_proportion:.2f}'
+				summary_line =f'{mean_intersection:.3f},{mean_original_only:.3f},{mean_shuffled_only:.3f},{mean_unique:.3f},{mean_unique_proportion:.3f}'
 				caller_aligner_dict_bp_means[caller_aligner][svtype]= summary_line
 
 		elif "summary_breakpoints" in inputfile:
@@ -171,7 +169,7 @@ def get_agreement_summary(caller,caller_csv_path, aligners, caller_sv_types, inp
 				mean_same_breakpoints = statistics.mean(same_breakpoint_values)
 				mean_different_breakpoints = statistics.mean(different_breakpoint_values)
 				mean_discordant_proportion = statistics.mean(discordant_proportion_values)
-				summary_line =f'{mean_intersection:.2f},{mean_same_breakpoints:.2f},{mean_different_breakpoints:.2f},{mean_discordant_proportion:.2f}'
+				summary_line =f'{mean_intersection:.3f},{mean_same_breakpoints:.3f},{mean_different_breakpoints:.3f},{mean_discordant_proportion:.3f}'
 				caller_aligner_dict_bp_means[caller_aligner][svtype]= summary_line
 
 		elif "overlap_comparison" in inputfile:
@@ -183,8 +181,6 @@ def get_agreement_summary(caller,caller_csv_path, aligners, caller_sv_types, inp
 				filters = set()
 
 				for stat_line in caller_aligner_dict_bp[caller_aligner][svtype]:
-					#print(stat_line)
-					#input("")
 					filters.add(stat_line[1])
 					total_calls_values.append(int(stat_line[2]))
 					intersection_values.append(int(stat_line[3]))
@@ -195,7 +191,13 @@ def get_agreement_summary(caller,caller_csv_path, aligners, caller_sv_types, inp
 				mean_intersection = statistics.mean(intersection_values)
 				mean_non_intersecting = statistics.mean(non_intersecting_values)
 				mean_non_intersecting_proportion = statistics.mean(non_intersecting_proportion_values)
-				summary_line =f'{mean_total_calls:.2f},{mean_intersection:.2f},{mean_non_intersecting:.2f},{mean_non_intersecting_proportion:.2f}'
+				stdev_total_calls = statistics.stdev(total_calls_values)
+				stdev_intersection = statistics.stdev(intersection_values)
+				stdev_non_intersecting = statistics.stdev(non_intersecting_values)
+				stdev_non_intersecting_proportion = statistics.stdev(non_intersecting_proportion_values)
+				#summary_line =f'{mean_total_calls:.3f}±{stdev_total_calls:.3f},{mean_intersection:.3f}±{stdev_intersection:.3f},{mean_non_intersecting:.3f}±{stdev_non_intersecting:.3f},{mean_non_intersecting_proportion:.3f}±{stdev_non_intersecting_proportion:.3f}'
+				summary_line =f'{mean_total_calls:.0f}±{stdev_total_calls:.0f},{mean_intersection:.0f}±{stdev_intersection:.0f},{mean_non_intersecting:.0f}±{stdev_non_intersecting:.0f},{mean_non_intersecting_proportion:.3f}±{stdev_non_intersecting_proportion:.3f}'
+
 				caller_aligner_dict_bp_means[caller_aligner][svtype]= summary_line
 
 		else:
