@@ -1,6 +1,5 @@
 include: "0_input/includes/Snakefile.subsample.py"
-ALL_STRAINS = ["XZ1516", "N2"] # Use two isolates to run the pipeline more quickly
-#ALL_STRAINS = ["JU1400", "NIC2", "JU2526", "XZ1516", "MY2693", "QX1794", "NIC526", "N2", "DL238","ECA396","JU2600","ECA36","EG4725","MY2147","JU310"]
+ALL_STRAINS = ["JU1400", "NIC2", "JU2526", "XZ1516", "MY2693", "QX1794", "NIC526", "N2", "DL238","ECA396","JU2600","ECA36","EG4725","MY2147","JU310"]
 READORDER = ["shuffled","original"]
 REFERENCE = "0_input/reference/c_elegans.PRJNA13758.WS263.genomic.fa" # C. elegans reference genome
 SAM_ALIGNERS = ["ngmlr","minimap2"] # Aligners that output sam files
@@ -12,7 +11,7 @@ FULL_SUBSAMPLED_DEPTHS = ["full_depth", "subsampled/10X", "subsampled/20X", "sub
 SUBSAMPLED_DEPTHS = ["10X", "20X", "40X", "60X"]
 COMPARISON_SUMMARY_FILES = ["summary/overlap_comparison_all_svs.csv", "unique/non_intersecting_all_svs.csv", "summary/overlap_comparison_coords_all_svs.csv", "unique/non_intersecting_coords_all_svs.csv", "summary/overlap_comparison_relaxed_all_svs.csv", "unique/non_intersecting_relaxed_all_svs.csv"]
 OVERLAP_SUMMARY_FILES = ['agreement_summary_total.csv', 'agreement_summary_coords_total.csv', 'agreement_summary_relaxed_total.csv']
-SUBAMPLED_COMBINED_LONG_TABLE_FILES = ["total.csv", "coords_total.csv", "relaxed_total.csv"]
+SUBSAMPLED_COMBINED_TABLE_FILES = ["total.csv", "coords_total.csv", "relaxed_total.csv"]
 
 rule all:
 	input:
@@ -29,15 +28,9 @@ rule all:
 		expand("4_results/{depth}/sv_intersection_agreement/svim/qual_{svim_qual}/svim-{aligner}_{resultsuffix}", depth = FULL_SUBSAMPLED_DEPTHS, svim_qual=SVIM_QUAL, aligner = SNIFFLES_SVIM_ALIGNERS, resultsuffix=OVERLAP_SUMMARY_FILES),
 		expand("4_results/{depth}/sv_intersection_agreement/sniffles/sniffles-{aligner}_{resultsuffix}", depth = FULL_SUBSAMPLED_DEPTHS, aligner = SNIFFLES_SVIM_ALIGNERS, resultsuffix=OVERLAP_SUMMARY_FILES),
 		expand("4_results/{depth}/sv_intersection_agreement/pbsv/pbsv-{aligner}_{resultsuffix}", depth = FULL_SUBSAMPLED_DEPTHS, aligner = PBSV_ALIGNERS, resultsuffix=OVERLAP_SUMMARY_FILES),
-		#expand("4_results/subsampled/combined/sv_intersection_agreement/pbsv/combined_long_table/pbsv-{aligner}_agreement_summary_{analysis}", aligner = PBSV_ALIGNERS, analysis = SUBAMPLED_COMBINED_LONG_TABLE_FILES),
-		#expand("4_results/subsampled/combined/sv_intersection_agreement/sniffles/combined_long_table/sniffles-{aligner}_agreement_summary_{analysis}", aligner = SNIFFLES_SVIM_ALIGNERS, analysis = SUBAMPLED_COMBINED_LONG_TABLE_FILES),
-		#expand("4_results/subsampled/combined/sv_intersection_agreement/svim/qual_{svim_qual}/combined_long_table/svim-{aligner}_agreement_summary_{analysis}", svim_qual = SVIM_QUAL, aligner = SNIFFLES_SVIM_ALIGNERS, analysis = SUBAMPLED_COMBINED_LONG_TABLE_FILES),
-		##--##expand("4_results/{depth}/sv_intersection_agreement/pbsv/subtotal_table/pbsv-{aligner}_summary_overlap_subtotals.csv", depth = FULL_SUBSAMPLED_DEPTHS, aligner = PBSV_ALIGNERS),
-		#expand("4_results/{depth}/sv_intersection_agreement/sniffles/subtotal_table/sniffles-{aligner}_summary_overlap_subtotals.csv", depth = FULL_SUBSAMPLED_DEPTHS, aligner = SNIFFLES_SVIM_ALIGNERS),
-		#expand("4_results/{depth}/sv_intersection_agreement/svim/qual_{svim_qual}/subtotal_table/svim-{aligner}_summary_overlap_subtotals.csv", depth = FULL_SUBSAMPLED_DEPTHS, svim_qual=SVIM_QUAL, aligner = SNIFFLES_SVIM_ALIGNERS),
-		#Don't uncomment these#expand("4_results/{depth}/{analysis}/sniffles/sniffles-{aligner}_{resultsuffix}", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = SNIFFLES_SVIM_ALIGNERS, resultsuffix=COMPARISON_SUMMARY_FILES),
-		#expand("4_results/{depth}/{analysis}/pbsv/pbsv-{aligner}_{resultsuffix}", depth = FULL_SUBSAMPLED_DEPTHS, analysis = ["sv_intersection_agreement", "breakpoint_agreement"], aligner = PBSV_ALIGNERS, resultsuffix=COMPARISON_SUMMARY_FILES),
-		#"5_plots/full_depth/1_sv_agreement.png",
+		expand("4_results/subsampled/combined/sv_intersection_agreement/pbsv/{table_style}/pbsv-{aligner}_agreement_summary_{analysis}", table_style =["combined_wide_table","combined_long_table"], aligner = PBSV_ALIGNERS, analysis = SUBSAMPLED_COMBINED_TABLE_FILES),
+		expand("4_results/subsampled/combined/sv_intersection_agreement/sniffles/{table_style}/sniffles-{aligner}_agreement_summary_{analysis}", table_style =["combined_wide_table","combined_long_table"], aligner = SNIFFLES_SVIM_ALIGNERS, analysis = SUBSAMPLED_COMBINED_TABLE_FILES),
+		expand("4_results/subsampled/combined/sv_intersection_agreement/svim/qual_{svim_qual}/{table_style}/svim-{aligner}_agreement_summary_{analysis}", table_style =["combined_wide_table","combined_long_table"], svim_qual = SVIM_QUAL, aligner = SNIFFLES_SVIM_ALIGNERS, analysis = SUBSAMPLED_COMBINED_TABLE_FILES),
 
 # Create FASTQ files with randomized read orders from original FASTQ files
 rule shuffle:
@@ -305,3 +298,54 @@ rule summarize_svim_results:
 		time_hms="00:10:00"
 	shell:
 		"python scripts/3_summarize_results_by_type/1_summarize_by_sv_type.py svim 3_variant_calls/{params.depth_wc}/ALIGNER/svim/STRAIN/shuffled/qual_{params.svim_qual_wc}/summary/ 4_results/{params.depth_wc}  --svim_qual {params.svim_qual_wc}"
+
+rule create_combined_intersection_tables_long_pbsv:
+	input:
+		depth_10x="4_results/subsampled/10X/sv_intersection_agreement/pbsv/pbsv-{aligner}_agreement_summary_{analysis}",
+		depth_20x="4_results/subsampled/20X/sv_intersection_agreement/pbsv/pbsv-{aligner}_agreement_summary_{analysis}",
+		depth_40x="4_results/subsampled/40X/sv_intersection_agreement/pbsv/pbsv-{aligner}_agreement_summary_{analysis}",
+		depth_60x="4_results/subsampled/60X/sv_intersection_agreement/pbsv/pbsv-{aligner}_agreement_summary_{analysis}",
+	output:
+		 expand("4_results/subsampled/combined/sv_intersection_agreement/pbsv/{table_style}/pbsv-{aligner}_agreement_summary_{analysis}", table_style =["combined_wide_table","combined_long_table"], allow_missing=True)
+	params:
+		aligner_wc=lambda wc: wc.get("aligner")
+	resources:
+		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
+		time_hms="00:10:00"
+	shell:
+		"python scripts/3_summarize_results_by_type/2_combine_subsampled_tables.py {input.depth_10x} {input.depth_20x} {input.depth_40x} {input.depth_60x} pbsv"
+
+rule create_combined_intersection_tables_long_sniffles:
+	input:
+		depth_10x="4_results/subsampled/10X/sv_intersection_agreement/sniffles/sniffles-{aligner}_agreement_summary_{analysis}",
+		depth_20x="4_results/subsampled/20X/sv_intersection_agreement/sniffles/sniffles-{aligner}_agreement_summary_{analysis}",
+		depth_40x="4_results/subsampled/40X/sv_intersection_agreement/sniffles/sniffles-{aligner}_agreement_summary_{analysis}",
+		depth_60x="4_results/subsampled/60X/sv_intersection_agreement/sniffles/sniffles-{aligner}_agreement_summary_{analysis}",
+	output:
+		 expand("4_results/subsampled/combined/sv_intersection_agreement/sniffles/{table_style}/sniffles-{aligner}_agreement_summary_{analysis}", table_style =["combined_wide_table","combined_long_table"], allow_missing=True)
+	params:
+		depth_wc=lambda wc: wc.get("depth"),
+		aligner_wc=lambda wc: wc.get("aligner")
+	resources:
+		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
+		time_hms="00:10:00"
+	shell:
+		"python scripts/3_summarize_results_by_type/2_combine_subsampled_tables.py {input.depth_10x} {input.depth_20x} {input.depth_40x} {input.depth_60x} sniffles"
+
+rule create_combined_intersection_tables_long_svim:
+	input:
+		depth_10x="4_results/subsampled/10X/sv_intersection_agreement/svim/qual_{svim_qual}/svim-{aligner}_agreement_summary_{analysis}",
+		depth_20x="4_results/subsampled/20X/sv_intersection_agreement/svim/qual_{svim_qual}/svim-{aligner}_agreement_summary_{analysis}",
+		depth_40x="4_results/subsampled/40X/sv_intersection_agreement/svim/qual_{svim_qual}/svim-{aligner}_agreement_summary_{analysis}",
+		depth_60x="4_results/subsampled/60X/sv_intersection_agreement/svim/qual_{svim_qual}/svim-{aligner}_agreement_summary_{analysis}",
+	output:
+		 expand("4_results/subsampled/combined/sv_intersection_agreement/svim/qual_{svim_qual}/{table_style}/svim-{aligner}_agreement_summary_{analysis}", table_style =["combined_wide_table","combined_long_table"], allow_missing=True)
+	params:
+		depth_wc=lambda wc: wc.get("depth"),
+		aligner_wc=lambda wc: wc.get("aligner"),
+		svim_qual_wc=lambda wc: wc.get("svim_qual")
+	resources:
+		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
+		time_hms="00:10:00"
+	shell:
+		"python scripts/3_summarize_results_by_type/2_combine_subsampled_tables.py {input.depth_10x} {input.depth_20x} {input.depth_40x} {input.depth_60x} svim"
