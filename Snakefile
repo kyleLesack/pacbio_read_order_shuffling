@@ -12,6 +12,7 @@ SUBSAMPLED_DEPTHS = ["10X", "20X", "40X", "60X"]
 COMPARISON_SUMMARY_FILES = ["summary/overlap_comparison_all_svs.csv", "unique/non_intersecting_all_svs.csv", "summary/overlap_comparison_coords_all_svs.csv", "unique/non_intersecting_coords_all_svs.csv", "summary/overlap_comparison_relaxed_all_svs.csv", "unique/non_intersecting_relaxed_all_svs.csv"]
 OVERLAP_SUMMARY_FILES = ['agreement_summary_total.csv', 'agreement_summary_coords_total.csv', 'agreement_summary_relaxed_total.csv']
 SUBSAMPLED_COMBINED_TABLE_FILES = ["total.csv", "coords_total.csv", "relaxed_total.csv"]
+PLOTS = ["full_depth/1_sv_agreement_grouped_by_caller_counts_top_labels.png", "full_depth/coords/1_sv_agreement_coords_grouped_by_caller_counts_top_labels.png", "subsampled/2_sv_agreement_pbsv_counts.png", "subsampled/2_sv_agreement_sniffles_counts_subsampled.png", "subsampled/2_sv_agreement_pbsv_sniffles_svim_subsampled_counts.png", "subsampled/2_sv_agreement_svim_counts_subsampled.png"]
 
 rule all:
 	input:
@@ -31,6 +32,7 @@ rule all:
 		expand("4_results/subsampled/combined/sv_intersection_agreement/pbsv/{table_style}/pbsv-{aligner}_agreement_summary_{analysis}", table_style =["combined_wide_table","combined_long_table"], aligner = PBSV_ALIGNERS, analysis = SUBSAMPLED_COMBINED_TABLE_FILES),
 		expand("4_results/subsampled/combined/sv_intersection_agreement/sniffles/{table_style}/sniffles-{aligner}_agreement_summary_{analysis}", table_style =["combined_wide_table","combined_long_table"], aligner = SNIFFLES_SVIM_ALIGNERS, analysis = SUBSAMPLED_COMBINED_TABLE_FILES),
 		expand("4_results/subsampled/combined/sv_intersection_agreement/svim/qual_{svim_qual}/{table_style}/svim-{aligner}_agreement_summary_{analysis}", table_style =["combined_wide_table","combined_long_table"], svim_qual = SVIM_QUAL, aligner = SNIFFLES_SVIM_ALIGNERS, analysis = SUBSAMPLED_COMBINED_TABLE_FILES),
+		expand("5_plots/{plot_name}", plot_name = PLOTS)
 
 # Create FASTQ files with randomized read orders from original FASTQ files
 rule shuffle:
@@ -349,3 +351,17 @@ rule create_combined_intersection_tables_long_svim:
 		time_hms="00:10:00"
 	shell:
 		"python scripts/3_summarize_results_by_type/2_combine_subsampled_tables.py {input.depth_10x} {input.depth_20x} {input.depth_40x} {input.depth_60x} svim"
+
+rule r_plot_sv_agreement_differences_fig1:
+	input:
+		expand("4_results/{depth}/sv_intersection_agreement/svim/qual_{svim_qual}/svim-{aligner}_{resultsuffix}", depth = FULL_SUBSAMPLED_DEPTHS, svim_qual=SVIM_QUAL, aligner = SNIFFLES_SVIM_ALIGNERS, resultsuffix=OVERLAP_SUMMARY_FILES),
+		expand("4_results/{depth}/sv_intersection_agreement/sniffles/sniffles-{aligner}_{resultsuffix}", depth = FULL_SUBSAMPLED_DEPTHS, aligner = SNIFFLES_SVIM_ALIGNERS, resultsuffix=OVERLAP_SUMMARY_FILES),
+		expand("4_results/{depth}/sv_intersection_agreement/pbsv/pbsv-{aligner}_{resultsuffix}", depth = FULL_SUBSAMPLED_DEPTHS, aligner = PBSV_ALIGNERS, resultsuffix=OVERLAP_SUMMARY_FILES)
+	output:
+		expand("5_plots/{plot_name}", plot_name = PLOTS)
+	conda:  "yaml/R.yaml"
+	resources:
+		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 1000),
+		time="00:10:00"
+	script:
+		"scripts/4_plot_results/1_plot_sv_agreement_differences.R"

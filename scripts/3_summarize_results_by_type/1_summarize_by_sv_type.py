@@ -52,53 +52,32 @@ def import_lines(filename, aligner,strain, caller_sv_types):
 		sv_call_lines = sv_type_dict[x]
 		line_count = len(sv_call_lines) # Number of values for the key. There are > 1 if multiple filter types
 
-		if "summary_breakpoints" in filename:
-			if line_count > 1:
-				intersection_total = 0
-				same_breakpoint_total = 0
-				different_breakpoint_total = 0
-				total_filters = []
-				for line in sv_call_lines:
-					total_filters.append(line[0])
-					intersection_total += int(line[1])
-					same_breakpoint_total += int(line[2])
-					different_breakpoint_total += int(line[3])
-				discordant_proportion = different_breakpoint_total/intersection_total
-				total_filters_joined = ";".join(total_filters)
-				new_line = [strain, str(total_filters_joined),intersection_total, same_breakpoint_total,different_breakpoint_total,discordant_proportion]
-				sv_type_dict_totals[x].append(new_line)
+		if line_count > 1:
+			calls_total = 0
+			intersection_total = 0
+			non_intersecting_total = 0
+			total_filters = []
+			for line in sv_call_lines:
+				total_filters.append(line[0])
+				calls_total += int(line[1])
+				intersection_total += int(line[2])
+				non_intersecting_total += int(line[3])
 
-			else:
-				sv_agreement_line = list(chain.from_iterable(sv_call_lines))
-				sv_agreement_line.insert(0,strain)
-				sv_type_dict_totals[x].append(sv_agreement_line)
+			non_intersecting_proportion = non_intersecting_total / calls_total
+			total_filters_joined = ";".join(total_filters)
+			new_line = [strain, str(total_filters_joined), calls_total, intersection_total,non_intersecting_total,non_intersecting_proportion]
+			sv_type_dict_totals[x].append(new_line)
 
-		elif "overlap_comparison" in filename:
-			if line_count > 1:
-				calls_total = 0
-				intersection_total = 0
-				non_intersecting_total = 0
-				total_filters = []
-				for line in sv_call_lines:
-					total_filters.append(line[0])
-					calls_total += int(line[1])
-					intersection_total += int(line[2])
-					non_intersecting_total += int(line[3])
+		else:
+			sv_agreement_line = list(chain.from_iterable(sv_call_lines))
+			sv_agreement_line.insert(0,strain)
+			sv_type_dict_totals[x].append(sv_agreement_line)
 
-				non_intersecting_proportion = non_intersecting_total / calls_total
-				total_filters_joined = ";".join(total_filters)
-				new_line = [strain, str(total_filters_joined), calls_total, intersection_total,non_intersecting_total,non_intersecting_proportion]
-				sv_type_dict_totals[x].append(new_line)
-
-			else:
-				sv_agreement_line = list(chain.from_iterable(sv_call_lines))
-				sv_agreement_line.insert(0,strain)
-				sv_type_dict_totals[x].append(sv_agreement_line)
 	return(sv_type_dict_totals)
 
 # Function calculates the agreement statistics for each caller/aligner combo.
 # Parameters: caller = caller name ,caller_csv_path = path to caller csv files, aligners = aligners used to generate alignments for the caller, caller_sv_types = sv types predicted by the caller
-def get_agreement_summary(caller,caller_csv_path, aligners, caller_sv_types, inputfile):
+def get_agreement_summary(caller,caller_csv_path, aligners, caller_sv_types, inputfile, write_stdev):
 	# caller_aligner_dict_bp: dictionary to store the sv overlap or breakpoint agreement data imported from csv files
 	# caller_aligner_dict_bp: keys = caller/aligner combo and the svtype
 	# caller_aligner_dict_bp: values = filters, intersection, same breakpoints, different breakpoints
@@ -125,54 +104,7 @@ def get_agreement_summary(caller,caller_csv_path, aligners, caller_sv_types, inp
 	caller_aligner_dict_bp_means = defaultdict(lambda: defaultdict(list)) # Dictionary to store the mean
 	#caller_aligner_dict_bp_means = defaultdict(lambda: defaultdict)
 	for caller_aligner in caller_aligner_dict_bp.keys(): # Loop to calculate means for each statistic
-		if "agreement_summary" in inputfile:
-			for svtype in caller_aligner_dict_bp[caller_aligner]:
-				intersection_values = []
-				original_only_values = []
-				shuffled_only_values = []
-				unique_values = []
-				unique_proportion_values = []
-				filters = set()
-
-				for stat_line in caller_aligner_dict_bp[caller_aligner][svtype]:
-					filters.add(stat_line[1])
-					intersection_values.append(int(stat_line[2]))
-					original_only_values.append(int(stat_line[3]))
-					shuffled_only_values.append(int(stat_line[4]))
-					unique_values.append(float(stat_line[5]))
-					unique_proportion_values.append(float(stat_line[6]))
-
-				mean_intersection = statistics.mean(intersection_values)
-				mean_original_only = statistics.mean(original_only_values)
-				mean_shuffled_only = statistics.mean(shuffled_only_values)
-				mean_unique = statistics.mean(unique_values)
-				mean_unique_proportion = statistics.mean(unique_proportion_values)
-				summary_line =f'{mean_intersection:.3f},{mean_original_only:.3f},{mean_shuffled_only:.3f},{mean_unique:.3f},{mean_unique_proportion:.3f}'
-				caller_aligner_dict_bp_means[caller_aligner][svtype]= summary_line
-
-		elif "summary_breakpoints" in inputfile:
-			for svtype in caller_aligner_dict_bp[caller_aligner]:
-				intersection_values = []
-				same_breakpoint_values = []
-				different_breakpoint_values = []
-				discordant_proportion_values = []
-				filters = set()
-
-				for stat_line in caller_aligner_dict_bp[caller_aligner][svtype]:
-					filters.add(stat_line[1])
-					intersection_values.append(int(stat_line[2]))
-					same_breakpoint_values.append(int(stat_line[3]))
-					different_breakpoint_values.append(int(stat_line[4]))
-					discordant_proportion_values.append(float(stat_line[5]))
-
-				mean_intersection = statistics.mean(intersection_values)
-				mean_same_breakpoints = statistics.mean(same_breakpoint_values)
-				mean_different_breakpoints = statistics.mean(different_breakpoint_values)
-				mean_discordant_proportion = statistics.mean(discordant_proportion_values)
-				summary_line =f'{mean_intersection:.3f},{mean_same_breakpoints:.3f},{mean_different_breakpoints:.3f},{mean_discordant_proportion:.3f}'
-				caller_aligner_dict_bp_means[caller_aligner][svtype]= summary_line
-
-		elif "overlap_comparison" in inputfile:
+		if "overlap_comparison" in inputfile:
 			for svtype in caller_aligner_dict_bp[caller_aligner]:
 				total_calls_values = []
 				intersection_values = []
@@ -195,9 +127,10 @@ def get_agreement_summary(caller,caller_csv_path, aligners, caller_sv_types, inp
 				stdev_intersection = statistics.stdev(intersection_values)
 				stdev_non_intersecting = statistics.stdev(non_intersecting_values)
 				stdev_non_intersecting_proportion = statistics.stdev(non_intersecting_proportion_values)
-				#summary_line =f'{mean_total_calls:.3f}±{stdev_total_calls:.3f},{mean_intersection:.3f}±{stdev_intersection:.3f},{mean_non_intersecting:.3f}±{stdev_non_intersecting:.3f},{mean_non_intersecting_proportion:.3f}±{stdev_non_intersecting_proportion:.3f}'
-				summary_line =f'{mean_total_calls:.0f}±{stdev_total_calls:.0f},{mean_intersection:.0f}±{stdev_intersection:.0f},{mean_non_intersecting:.0f}±{stdev_non_intersecting:.0f},{mean_non_intersecting_proportion:.3f}±{stdev_non_intersecting_proportion:.3f}'
-
+				if write_stdev:
+					summary_line =f'{mean_total_calls:.0f}±{stdev_total_calls:.0f},{mean_intersection:.0f}±{stdev_intersection:.0f},{mean_non_intersecting:.0f}±{stdev_non_intersecting:.0f},{mean_non_intersecting_proportion:.3f}±{stdev_non_intersecting_proportion:.3f}'
+				else:
+					summary_line =f'{mean_total_calls:.0f},{mean_intersection:.0f},{mean_non_intersecting:.0f},{mean_non_intersecting_proportion:.3f}'
 				caller_aligner_dict_bp_means[caller_aligner][svtype]= summary_line
 
 		else:
@@ -246,12 +179,27 @@ elif args.caller == "svim":
 	caller_sv_types = SVIM_SV_TYPES
 	sv_intersection_outputdir = args.outputpath + "/sv_intersection_agreement/" + caller + "/qual_" + args.svim_qual + "/"
 
-sv_intersection_means = get_agreement_summary(caller,args.caller_csv_path, aligners, caller_sv_types , "overlap_comparison_all_svs.csv")
-sv_intersection_means_coords = get_agreement_summary(caller,args.caller_csv_path, aligners, caller_sv_types , "overlap_comparison_coords_all_svs.csv")
-sv_intersection_means_relaxed = get_agreement_summary(caller,args.caller_csv_path, aligners, caller_sv_types , "overlap_comparison_relaxed_all_svs.csv")
+# Get means without standard deviations
+sv_intersection_means = get_agreement_summary(caller,args.caller_csv_path, aligners, caller_sv_types , "overlap_comparison_all_svs.csv", False)
+sv_intersection_means_coords = get_agreement_summary(caller,args.caller_csv_path, aligners, caller_sv_types , "overlap_comparison_coords_all_svs.csv", False)
+sv_intersection_means_relaxed = get_agreement_summary(caller,args.caller_csv_path, aligners, caller_sv_types , "overlap_comparison_relaxed_all_svs.csv", False)
 
 if args.caller != "svim":
 	sv_intersection_outputdir = args.outputpath + "/sv_intersection_agreement/" + caller + "/"
+
+write_results(sv_intersection_means, sv_intersection_outputdir, OVERLAP_SUMMARY_HEADER, "_agreement_summary_total")
+write_results(sv_intersection_means_coords, sv_intersection_outputdir, OVERLAP_SUMMARY_HEADER, "_agreement_summary_coords_total")
+write_results(sv_intersection_means_relaxed, sv_intersection_outputdir, OVERLAP_SUMMARY_HEADER, "_agreement_summary_relaxed_total")
+
+# Get means and standard deviations
+sv_intersection_means = get_agreement_summary(caller,args.caller_csv_path, aligners, caller_sv_types , "overlap_comparison_all_svs.csv", True)
+sv_intersection_means_coords = get_agreement_summary(caller,args.caller_csv_path, aligners, caller_sv_types , "overlap_comparison_coords_all_svs.csv", True)
+sv_intersection_means_relaxed = get_agreement_summary(caller,args.caller_csv_path, aligners, caller_sv_types , "overlap_comparison_relaxed_all_svs.csv", True)
+
+if args.caller != "svim":
+	sv_intersection_outputdir = args.outputpath + "/sv_intersection_agreement/" + caller + "/with_stdev/"
+else:
+	sv_intersection_outputdir = args.outputpath + "/sv_intersection_agreement/" + caller + "/qual_" + args.svim_qual + "/with_stdev/"
 
 write_results(sv_intersection_means, sv_intersection_outputdir, OVERLAP_SUMMARY_HEADER, "_agreement_summary_total")
 write_results(sv_intersection_means_coords, sv_intersection_outputdir, OVERLAP_SUMMARY_HEADER, "_agreement_summary_coords_total")
