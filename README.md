@@ -41,18 +41,33 @@ The ./Snakefile contains the code to run the pipeline. A second Snakefile contai
 The pipeline expects the input FASTQ files in the following locations:
 
 1_fq_processing/N2/original/N2_original.fastq
+
 1_fq_processing/JU1400/original/JU1400_original.fastq
+
 1_fq_processing/NIC2/original/NIC2_original.fastq
+
 1_fq_processing/JU2526/original/JU2526_original.fastq
+
 1_fq_processing/XZ1516/original/XZ1516_original.fastq
+
 1_fq_processing/MY2693/original/MY2693_original.fastq
+
 1_fq_processing/QX1794/original/QX1794_original.fastq
+
 1_fq_processing/NIC526/original/NIC526_original.fastq
+
 1_fq_processing/DL238/original/DL238_original.fastq
+
 1_fq_processing/ECA396/original/ECA396_original.fastq
+
 1_fq_processing/JU2600/original/JU2600_original.fastq
+
 1_fq_processing/ECA36/original/ECA36_original.fastq
+
 1_fq_processing/EG4725/original/EG4725_original.fastq
+
 1_fq_processing/JU310/original/JU310_original.fastq
+
 1_fq_processing/MY2147/original/MY2147_original.fastq
+
 1_fq_processing/N2/original/N2_original.fastq
