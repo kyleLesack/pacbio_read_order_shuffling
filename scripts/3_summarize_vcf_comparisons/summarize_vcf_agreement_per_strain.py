@@ -32,7 +32,7 @@ def parse_csv_files(csv_files,caller):
 	sv_agreement_stats_df = pd.DataFrame(csv_lines_list, columns = csv_header)
 	sv_agreement_stats_df["Jaccard Index"] = pd.to_numeric(sv_agreement_stats_df["Jaccard Index"])
 	sv_agreement_stats_df["Jaccard Distance"] = pd.to_numeric(sv_agreement_stats_df["Jaccard Distance"])
-	sv_agreement_stats_df["Symmetric Distance"] = pd.to_numeric(sv_agreement_stats_df["Symmetric Distance"])
+	sv_agreement_stats_df["Symmetric Difference"] = pd.to_numeric(sv_agreement_stats_df["Symmetric Difference"])
 
 	return(sv_agreement_stats_df)
 

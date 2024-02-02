@@ -30,13 +30,18 @@ Several files were too large to include here and need to be downloaded or create
 		* 0_reference_includes/reference/c_elegans.PRJNA13758.WS263.genomic.fa-enc.2.ngm
 		* 0_reference_includes/reference/c_elegans.PRJNA13758.WS263.genomic.fa-ht-13-2.2.ngm
 		* 0_reference_includes/reference/c_elegans.PRJNA13758.WS263.genomic.fa.sa
+		* arabidopsis/0_reference_includes/reference/GCF_000001735.4_TAIR10.1_genomic.fa
+		* arabidopsis/0_reference_includes/reference/GCF_000001735.4_TAIR10.1_genomic.fa-enc.2.ngm  
+		* arabidopsis/0_reference_includes/reference/GCF_000001735.4_TAIR10.1_genomic.fa-ht-13-2.2.ngm
 * *C. elegans PacBio* sequencing data
 	* [PacBio sequencing data](https://www.ncbi.nlm.nih.gov/bioproject?LinkName=sra_bioproject&from_uid=12908562) from the [Caenorhabditis elegans Natural Diversity Resource](https://www.elegansvariation.org/)
 	* [PacBio sequencing data](https://www.ncbi.nlm.nih.gov/sra/?term=DRR142768) for the N2 reference strain
+* *A. thaliana* sequencing are available from BioProject [PRJNA779205](https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJNA779205)
+
 
 # Snakemake pipeline
 
-The [Snakefile](./Snakefile) contains the code to run the pipeline. A second [Snakefile](./0_reference_includes/includes/Snakefile.subsample.py) contains the instructions required to perform the subsampling steps.
+The [Snakefile](./Snakefile) contains the code to run the pipeline. A second [Snakefile](./0_reference_includes/includes/Snakefile.subsample.py) contains the instructions required to perform the subsampling steps. The rule resources are based on our high performance computing cluster and may need to be optimized for other systems.
 
 The pipeline expects the input FASTQ files in the following locations:
 

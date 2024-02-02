@@ -401,33 +401,3 @@ rule concatenate_vcf_agreement_totals:
 		time_hms="00:30:00"
 	shell:
 		"python3 ../scripts/3_summarize_vcf_comparisons/summarize_original_shuffled_comparisons_arabidopsis.py {params.input_format} {params.outdir}"
-
-# Summarize the agreement for shuffled vcf files for each aligner/caller
-rule summarize_vcf_agreement:
-	input:
-		expand("4_variant_call_comparisons/{depth}/{aligner}/{caller}/{strain}/results.csv", strain = ALL_STRAINS, allow_missing = True)
-	output:
-		expand("5_vcf_comparison_summaries/{depth}/{aligner}/{caller}/{results_file}", results_file = AGREEMENT_SUMMARY_FILES, allow_missing = True)
-	params:
-		outdir="5_vcf_comparison_summaries/{depth}/{aligner}/{caller}/"
-	conda:  "yaml/pandas.yaml"
-	resources:
-		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
-		time_hms="01:00:00"
-	shell:
-		"python ../scripts/3_summarize_vcf_comparisons/summarize_vcf_comparisons.py -l {input} -o {params.outdir}"
-
-# Summarize the agreement for shuffled vcf files for each aligner/caller using the results that didn't include metadata
-rule summarize_vcf_agreement_no_meta:
-	input:
-		expand("4_variant_call_comparisons/{depth}/{aligner}/{caller}/{strain}/results_no_meta.csv", strain = ALL_STRAINS, allow_missing = True)
-	output:
-		expand("5_vcf_comparison_summaries/{depth}/{aligner}/{caller}/{results_file}", results_file = AGREEMENT_SUMMARY_NO_META_FILES, allow_missing = True)
-	params:
-		outdir="5_vcf_comparison_summaries/{depth}/{aligner}/{caller}/"
-	conda:  "yaml/pandas.yaml"
-	resources:
-		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
-		time_hms="01:00:00"
-	shell:
-		"python ../scripts/3_summarize_vcf_comparisons/summarize_vcf_comparisons.py -l {input} -o {params.outdir} --no_meta"

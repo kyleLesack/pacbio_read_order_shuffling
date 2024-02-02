@@ -329,8 +329,8 @@ def write_lines(my_list, outfile):
 def get_intersection_proportions(my_df):
 	jaccard_df = my_df[['SV Type']].copy()
 	jaccard_df['Jaccard Index'] = pandas.to_numeric(my_df['Intersection'] / my_df['Union'])
-	jaccard_df['Jaccard Distance'] = pandas.to_numeric(my_df['Symmetric difference'] / my_df['Union'])
-	jaccard_df['Symmetric Distance'] = pandas.to_numeric(my_df['Symmetric difference'])
+	jaccard_df['Jaccard Distance'] = pandas.to_numeric(my_df['Symmetric Difference'] / my_df['Union'])
+	jaccard_df['Symmetric Difference'] = pandas.to_numeric(my_df['Symmetric Difference'])
 
 	return(jaccard_df)
 
