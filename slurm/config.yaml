@@ -9,7 +9,7 @@ cluster:
     --error=logs/{rule}/{rule}-{wildcards}-%j.err
     --time=36:00:00
 default-resources:
-  - partition=synergy,single,lattice,cpu2019,cpu2021
+  - partition=synergy,single,cpu2019,cpu2021,cpu2022
   - mem_mb=50000
 restart-times: 3
 max-jobs-per-second: 10
