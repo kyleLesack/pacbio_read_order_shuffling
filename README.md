@@ -27,9 +27,9 @@ Several files were too large to include here and need to be downloaded or create
 
 * The [blasr](https://manpages.debian.org/testing/blasr/sawriter.1.en.html) sawriter command was used to generate suffix array files and NGMLR indexes that were required for pbmm2/pbsv
 	* The Snakemake pipeline expects them to be in the following directories:
-		* 0_input/reference/c_elegans.PRJNA13758.WS263.genomic.fa-enc.2.ngm
-		* 0_input/reference/c_elegans.PRJNA13758.WS263.genomic.fa-ht-13-2.2.ngm
-		* 0_input/reference/c_elegans.PRJNA13758.WS263.genomic.fa.sa
+		* 0_reference_includes/reference/c_elegans.PRJNA13758.WS263.genomic.fa-enc.2.ngm
+		* 0_reference_includes/reference/c_elegans.PRJNA13758.WS263.genomic.fa-ht-13-2.2.ngm
+		* 0_reference_includes/reference/c_elegans.PRJNA13758.WS263.genomic.fa.sa
 * *C. elegans PacBio* sequencing data
 	* [PacBio sequencing data](https://www.ncbi.nlm.nih.gov/bioproject?LinkName=sra_bioproject&from_uid=12908562) from the [Caenorhabditis elegans Natural Diversity Resource](https://www.elegansvariation.org/)
 	* [PacBio sequencing data](https://www.ncbi.nlm.nih.gov/sra/?term=DRR142768) for the N2 reference strain
