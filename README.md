@@ -61,3 +61,7 @@ The pipeline expects the input FASTQ files in the following locations:
 1_fq_processing/JU310/original/JU310_original.fastq
 1_fq_processing/MY2147/original/MY2147_original.fastq
 1_fq_processing/N2/original/N2_original.fastq
+./arabidopsis/1_fq_processing/1254/original/1254_original.fastq
+./arabidopsis/1_fq_processing/6021/original/6021_original.fastq
+./arabidopsis/1_fq_processing/6024/original/6024_original.fastq
+./arabidopsis/1_fq_processing/9470/original/9470_original.fastq
