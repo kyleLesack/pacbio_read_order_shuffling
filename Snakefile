@@ -58,7 +58,7 @@ rule pbmm2:
 		ancient("1_fq_processing/{strain}/{readorder}/{strain}_{readorder}.fastq")
 	output:
 		"2_alignments/full_depth/pbmm2/{strain}/{readorder}/{strain}_{readorder}_sorted.bam"
-	conda:  "yaml/pbmm2_1.12.yaml" # Updated August 2023
+	conda:  "yaml/pbmm2_1.12.yaml"
 	threads: 8
 	resources:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
@@ -86,7 +86,7 @@ rule minimap2:
 		ancient("1_fq_processing/{strain}/{readorder}/{strain}_{readorder}.fastq")
 	output:
 		temp("2_alignments/full_depth/minimap2/{strain}/{readorder}/{strain}_{readorder}.sam")
-	conda:  "yaml/minimap2_2.26.yaml" # Updated August 2023 from pbhoney to minimap2_2.26
+	conda:  "yaml/minimap2_2.26.yaml"
 	threads: 8
 	resources:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
@@ -102,7 +102,7 @@ rule sam2bam:
 		temp("2_alignments/full_depth/{aligner}/{strain}/{readorder}/{strain}_{readorder}.bam")
 	wildcard_constraints:
 		aligner = "|".join(SAM_ALIGNERS)
-	conda:  "yaml/samtools_1.9.yaml" # Updated August 2023 from 1.9 to 1.17
+	conda:  "yaml/samtools_1.9.yaml"
 	threads: 8
 	resources:
 		mem_mb=lambda _, attempt: 500 + ((attempt - 1) * 10000),
@@ -153,7 +153,7 @@ rule pbsvdiscover:
 		aligner = "|".join(PBSV_ALIGNERS)
 	params:
 		samplename="sample_{strain}"
-	conda:  "yaml/pbsv_2.9.yaml" # Updated August 2023
+	conda:  "yaml/pbsv_2.9.yaml"
 	threads: 8
 	resources:
 		mem_mb=lambda _, attempt: 25000 + ((attempt - 1) * 25000),
@@ -169,7 +169,7 @@ rule pbsvcall:
 		"3_variant_calls/{depth}/{aligner}/pbsv/{strain}/{readorder}/{strain}.vcf"
 	wildcard_constraints:
 		aligner = "|".join(PBSV_ALIGNERS)
-	conda:  "yaml/pbsv_2.9.yaml" # Updated August 2023
+	conda:  "yaml/pbsv_2.9.yaml"
 	threads: 8
 	resources:
 		mem_mb=lambda _, attempt: 50000 + ((attempt - 1) * 10000),
@@ -207,7 +207,7 @@ rule sniffles:
 		aligner = "|".join(SNIFFLES_SVIM_ALIGNERS),
 	params:
 		bamfile="2_alignments/{depth}/{aligner}/{strain}/{readorder}/{strain}_{readorder}_sorted.bam"
-	conda:  "yaml/sniffles_2.2.yaml" # Updated to latest on August 2023
+	conda:  "yaml/sniffles_2.2.yaml"
 	threads: 8
 	resources:
 		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
@@ -318,58 +318,7 @@ rule compare_svim_original:
 	shell:
 		"python3 scripts/2_compare_vcfs/compare_original_shuffled.py {input.original_vcf} {input.shuffled_vcf} {params.outdir} svim"
 
-# Compare the SVIM SVs predicted from the original FASTQ files with the shuffled versions
-rule compare_svim_old:
-	input:
-		shuffled_vcf="3_variant_calls/{depth}/{aligner}/svim/{strain}/shuffled/{replicate}/variants.vcf",
-		original_vcf="3_variant_calls/{depth}/{aligner}/svim/{strain}/original/variants.vcf"
-	output:
-		expand("3_variant_calls/{depth}/{aligner}/svim/{strain}/shuffled/{replicate}/qual_{svim_qual}/{summaryfile}", summaryfile=COMPARISON_SUMMARY_FILES, allow_missing=True)
-	params:
-		quality = "{svim_qual}",
-		minsize="100",
-		reciprocal="0.5"
-	conda:  "yaml/pybedtools.yaml"
-	resources:
-		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
-		time_hms="01:00:00"
-	shell:
-		"python3 scripts/2_compare_original_shuffled/compare_shuffled_2_original.py {input.shuffled_vcf} {input.original_vcf} svim --minsize {params.minsize} --min_qual_svim {params.quality} --reciprocal {params.reciprocal}"
-
-# Compare the Sniffles SVs predicted from the original FASTQ files with the shuffled versions
-rule compare_sniffles_old:
-	input:
-		shuffled_vcf="3_variant_calls/{depth}/{aligner}/sniffles/{strain}/shuffled/{replicate}/{strain}.vcf",
-		original_vcf="3_variant_calls/{depth}/{aligner}/sniffles/{strain}/original/{strain}.vcf",
-	output:
-		expand("3_variant_calls/{depth}/{aligner}/sniffles/{strain}/shuffled/{replicate}/{summaryfile}", summaryfile=COMPARISON_SUMMARY_FILES, allow_missing=True)
-	params:
-		minsize="100",
-		reciprocal="0.5"
-	conda:  "yaml/pybedtools.yaml"
-	resources:
-		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
-		time_hms="01:00:00"
-	shell:
-		"python3 scripts/2_compare_original_shuffled/compare_shuffled_2_original.py {input.shuffled_vcf} {input.original_vcf} sniffles --minsize {params.minsize} --reciprocal {params.reciprocal}"
-
-# Compare the pbsv SVs predicted from the original FASTQ files with the shuffled versions
-rule compare_pbsv_old:
-	input:
-		shuffled_vcf="3_variant_calls/{depth}/{aligner}/pbsv/{strain}/shuffled/{replicate}/{strain}.vcf",
-		original_vcf="3_variant_calls/{depth}/{aligner}/pbsv/{strain}/original/{strain}.vcf"
-	output:
-		expand("3_variant_calls/{depth}/{aligner}/pbsv/{strain}/shuffled/{replicate}/{summaryfile}", summaryfile=COMPARISON_SUMMARY_FILES, allow_missing=True)
-	params:
-		minsize="100",
-		reciprocal="0.5"
-	conda:  "yaml/pybedtools.yaml"
-	resources:
-		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
-		time_hms="01:00:00"
-	shell:
-		"python3 scripts/2_compare_original_shuffled/compare_shuffled_2_original.py {input.shuffled_vcf} {input.original_vcf} pbsv --minsize {params.minsize} --reciprocal {params.reciprocal}"
-
+# Summarize the SV call agreement per strain
 rule summarize_vcf_agreement_per_strain:
 	input:
 		pbsv_files=expand("4_variant_call_comparisons/{depth}/{aligner}/pbsv/{strain}/original_shuffled_comparisons/{shuffle_dir}/results_proportions.csv", shuffle_dir = SHUFFLED_DIRS, allow_missing = True),
@@ -403,6 +352,7 @@ rule summarize_vcf_agreement_per_strain_no_meta:
 	shell:
 		"python scripts/3_summarize_vcf_comparisons/summarize_vcf_agreement_per_strain.py -p {input.pbsv_files} -s {input.sniffles_files} -v {input.svim_files} -o {params.outdir} -n {wildcards.strain} --no_meta"
 
+# Contactenate vcf agreement stats per strain
 rule concatenate_per_strain_vcf_agreement:
 	input:
 		expand("5_vcf_comparison_summaries/{depth}/{aligner}/original_shuffled_agreement_per_strain/{strain}_results.csv", strain = ALL_STRAINS, allow_missing = True)
@@ -415,6 +365,7 @@ rule concatenate_per_strain_vcf_agreement:
 	shell:
 		"python scripts/3_summarize_vcf_comparisons/concatenate_agreement_per_strain_results.py -i {input} -o {output}"
 
+# Contactenate vcf agreement stats per strain for xyz.no_meta.csv files
 rule concatenate_per_strain_vcf_agreement_no_meta:
 	input:
 		expand("5_vcf_comparison_summaries/{depth}/{aligner}/original_shuffled_agreement_per_strain/{strain}_results_no_meta.csv", strain = ALL_STRAINS, allow_missing = True)
@@ -444,142 +395,3 @@ rule concatenate_vcf_agreement_totals:
 		time_hms="00:30:00"
 	shell:
 		"python3 scripts/3_summarize_vcf_comparisons/summarize_original_shuffled_comparisons.py {params.input_format} {params.outdir}"
-
-# Summarize the agreement for shuffled vcf files for each aligner/caller
-rule summarize_vcf_agreement:
-	input:
-		expand("4_variant_call_comparisons/{depth}/{aligner}/{caller}/{strain}/results.csv", strain = ALL_STRAINS, allow_missing = True)
-	output:
-		expand("5_vcf_comparison_summaries/{depth}/{aligner}/{caller}/{results_file}", results_file = AGREEMENT_SUMMARY_FILES, allow_missing = True)
-	params:
-		outdir="5_vcf_comparison_summaries/{depth}/{aligner}/{caller}/"
-	conda:  "yaml/pandas.yaml"
-	resources:
-		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
-		time_hms="01:00:00"
-	shell:
-		"python scripts/3_summarize_vcf_comparisons/summarize_vcf_comparisons.py -l {input} -o {params.outdir}"
-
-# Summarize the agreement for shuffled vcf files for each aligner/caller using the results that didn't include metadata
-rule summarize_vcf_agreement_no_meta:
-	input:
-		expand("4_variant_call_comparisons/{depth}/{aligner}/{caller}/{strain}/results_no_meta.csv", strain = ALL_STRAINS, allow_missing = True)
-	output:
-		expand("5_vcf_comparison_summaries/{depth}/{aligner}/{caller}/{results_file}", results_file = AGREEMENT_SUMMARY_NO_META_FILES, allow_missing = True)
-	params:
-		outdir="5_vcf_comparison_summaries/{depth}/{aligner}/{caller}/"
-	conda:  "yaml/pandas.yaml"
-	resources:
-		mem_mb=lambda _, attempt: 10000 + ((attempt - 1) * 10000),
-		time_hms="01:00:00"
-	shell:
-		"python scripts/3_summarize_vcf_comparisons/summarize_vcf_comparisons.py -l {input} -o {params.outdir} --no_meta"
-
-
-# Summarize the comparison results from compare_pbsv
-rule summarize_pbsv_results:
-	input:
-		expand("3_variant_calls/{depth}/{aligner}/pbsv/{strain}/shuffled/{replicate}/{summaryfile}", aligner = PBSV_ALIGNERS, strain = ALL_STRAINS, summaryfile = COMPARISON_SUMMARY_FILES, allow_missing=True),
-	output:
-		expand("4_results/{depth}/sv_intersection_agreement/pbsv/pbsv-{aligner}_{resultsuffix}", aligner = PBSV_ALIGNERS, strain = ALL_STRAINS,resultsuffix=OVERLAP_SUMMARY_FILES, allow_missing=True),
-	params:
-		depth_wc=lambda wc: wc.get("depth")
-	resources:
-		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
-		time_hms="00:10:00"
-	shell:
-		"python scripts/3_summarize_results_by_type/1_summarize_by_sv_type.py pbsv 3_variant_calls/{params.depth_wc}/ALIGNER/pbsv/STRAIN/shuffled/{replicate}/summary/ 4_results/{params.depth_wc}"
-
-# Summarize the comparison results from compare_sniffles
-rule summarize_sniffles_results:
-	input:
-		expand("3_variant_calls/{depth}/{aligner}/sniffles/{strain}/shuffled/{replicate}/{summaryfile}", aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS, summaryfile = COMPARISON_SUMMARY_FILES, allow_missing=True),
-	output:
-		expand("4_results/{depth}/sv_intersection_agreement/sniffles/sniffles-{aligner}_{resultsuffix}", aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS,resultsuffix=OVERLAP_SUMMARY_FILES, allow_missing=True),
-	params:
-		depth_wc=lambda wc: wc.get("depth")
-	resources:
-		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
-		time_hms="00:10:00"
-	shell:
-		"python scripts/3_summarize_results_by_type/1_summarize_by_sv_type.py sniffles 3_variant_calls/{params.depth_wc}/ALIGNER/sniffles/STRAIN/shuffled/{replicate}/summary/ 4_results/{params.depth_wc}"
-
-# Summarize the comparison results from compare_svim
-rule summarize_svim_results:
-	input:
-		expand("3_variant_calls/{depth}/{aligner}/svim/{strain}/shuffled/{replicate}/qual_{svim_qual}/{summaryfile}", aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS, summaryfile = COMPARISON_SUMMARY_FILES, allow_missing=True),
-	output:
-		expand("4_results/{depth}/sv_intersection_agreement/svim/qual_{svim_qual}/svim-{aligner}_{resultsuffix}", aligner = SNIFFLES_SVIM_ALIGNERS, strain = ALL_STRAINS,resultsuffix=OVERLAP_SUMMARY_FILES, allow_missing=True),
-	params:
-		depth_wc=lambda wc: wc.get("depth"),
-		svim_qual_wc=lambda wc: wc.get("svim_qual")
-	resources:
-		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
-		time_hms="00:10:00"
-	shell:
-		"python scripts/3_summarize_results_by_type/1_summarize_by_sv_type.py svim 3_variant_calls/{params.depth_wc}/ALIGNER/svim/STRAIN/shuffled/{replicate}/qual_{params.svim_qual_wc}/summary/ 4_results/{params.depth_wc}  --svim_qual {params.svim_qual_wc}"
-
-rule create_combined_intersection_tables_long_pbsv:
-	input:
-		depth_10x="4_results/subsampled/10X/sv_intersection_agreement/pbsv/pbsv-{aligner}_agreement_summary_{analysis}",
-		depth_20x="4_results/subsampled/20X/sv_intersection_agreement/pbsv/pbsv-{aligner}_agreement_summary_{analysis}",
-		depth_40x="4_results/subsampled/40X/sv_intersection_agreement/pbsv/pbsv-{aligner}_agreement_summary_{analysis}",
-		depth_60x="4_results/subsampled/60X/sv_intersection_agreement/pbsv/pbsv-{aligner}_agreement_summary_{analysis}",
-	output:
-		 expand("4_results/subsampled/combined/sv_intersection_agreement/pbsv/{table_style}/pbsv-{aligner}_agreement_summary_{analysis}", table_style =["combined_wide_table","combined_long_table"], allow_missing=True)
-	params:
-		aligner_wc=lambda wc: wc.get("aligner")
-	resources:
-		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
-		time_hms="00:10:00"
-	shell:
-		"python scripts/3_summarize_results_by_type/2_combine_subsampled_tables.py {input.depth_10x} {input.depth_20x} {input.depth_40x} {input.depth_60x} pbsv"
-
-rule create_combined_intersection_tables_long_sniffles:
-	input:
-		depth_10x="4_results/subsampled/10X/sv_intersection_agreement/sniffles/sniffles-{aligner}_agreement_summary_{analysis}",
-		depth_20x="4_results/subsampled/20X/sv_intersection_agreement/sniffles/sniffles-{aligner}_agreement_summary_{analysis}",
-		depth_40x="4_results/subsampled/40X/sv_intersection_agreement/sniffles/sniffles-{aligner}_agreement_summary_{analysis}",
-		depth_60x="4_results/subsampled/60X/sv_intersection_agreement/sniffles/sniffles-{aligner}_agreement_summary_{analysis}",
-	output:
-		 expand("4_results/subsampled/combined/sv_intersection_agreement/sniffles/{table_style}/sniffles-{aligner}_agreement_summary_{analysis}", table_style =["combined_wide_table","combined_long_table"], allow_missing=True)
-	params:
-		depth_wc=lambda wc: wc.get("depth"),
-		aligner_wc=lambda wc: wc.get("aligner")
-	resources:
-		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
-		time_hms="00:10:00"
-	shell:
-		"python scripts/3_summarize_results_by_type/2_combine_subsampled_tables.py {input.depth_10x} {input.depth_20x} {input.depth_40x} {input.depth_60x} sniffles"
-
-rule create_combined_intersection_tables_long_svim:
-	input:
-		depth_10x="4_results/subsampled/10X/sv_intersection_agreement/svim/qual_{svim_qual}/svim-{aligner}_agreement_summary_{analysis}",
-		depth_20x="4_results/subsampled/20X/sv_intersection_agreement/svim/qual_{svim_qual}/svim-{aligner}_agreement_summary_{analysis}",
-		depth_40x="4_results/subsampled/40X/sv_intersection_agreement/svim/qual_{svim_qual}/svim-{aligner}_agreement_summary_{analysis}",
-		depth_60x="4_results/subsampled/60X/sv_intersection_agreement/svim/qual_{svim_qual}/svim-{aligner}_agreement_summary_{analysis}",
-	output:
-		 expand("4_results/subsampled/combined/sv_intersection_agreement/svim/qual_{svim_qual}/{table_style}/svim-{aligner}_agreement_summary_{analysis}", table_style =["combined_wide_table","combined_long_table"], allow_missing=True)
-	params:
-		depth_wc=lambda wc: wc.get("depth"),
-		aligner_wc=lambda wc: wc.get("aligner"),
-		svim_qual_wc=lambda wc: wc.get("svim_qual")
-	resources:
-		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 10000),
-		time_hms="00:10:00"
-	shell:
-		"python scripts/3_summarize_results_by_type/2_combine_subsampled_tables.py {input.depth_10x} {input.depth_20x} {input.depth_40x} {input.depth_60x} svim"
-
-rule r_plot_sv_agreement_differences_fig1:
-	input:
-		expand("4_results/{depth}/sv_intersection_agreement/svim/qual_{svim_qual}/svim-{aligner}_{resultsuffix}", depth = FULL_SUBSAMPLED_DEPTHS, svim_qual=SVIM_QUAL, aligner = SNIFFLES_SVIM_ALIGNERS, resultsuffix=OVERLAP_SUMMARY_FILES),
-		expand("4_results/{depth}/sv_intersection_agreement/sniffles/sniffles-{aligner}_{resultsuffix}", depth = FULL_SUBSAMPLED_DEPTHS, aligner = SNIFFLES_SVIM_ALIGNERS, resultsuffix=OVERLAP_SUMMARY_FILES),
-		expand("4_results/{depth}/sv_intersection_agreement/pbsv/pbsv-{aligner}_{resultsuffix}", depth = FULL_SUBSAMPLED_DEPTHS, aligner = PBSV_ALIGNERS, resultsuffix=OVERLAP_SUMMARY_FILES)
-	output:
-		expand("5_plots/{plot_name}", plot_name = PLOTS)
-	conda:  "yaml/R.yaml"
-	resources:
-		mem_mb=lambda _, attempt: 1000 + ((attempt - 1) * 1000),
-		time="00:10:00"
-	script:
-		"scripts/4_plot_results/1_plot_sv_agreement_differences.R"

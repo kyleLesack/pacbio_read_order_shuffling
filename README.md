@@ -4,7 +4,7 @@ These scripts were used to evaluate the impact of FASTQ file read order on struc
 
 # Requirements
 
-Note: The ./yaml directory include conda yaml environment files. I recommend using conda to install the required software using these files. The required tools and the versions we tested are listed below:
+Note: The [yaml](./yaml/) directory includes conda yaml environment files. I recommend using conda to install the required software using these files. The required tools and the versions we tested are listed below:
 
 * [Snakemake](https://snakemake.readthedocs.io/en/stable/) (v.7.25.0)
 * [Picard](https://broadinstitute.github.io/picard/) (v.2.27.5)
@@ -36,38 +36,23 @@ Several files were too large to include here and need to be downloaded or create
 
 # Snakemake pipeline
 
-The ./Snakefile contains the code to run the pipeline. A second Snakefile contains the instructions required to perform the subsampling steps.
+The [Snakefile](./Snakefile) contains the code to run the pipeline. A second [Snakefile](./0_reference_includes/includes/Snakefile.subsample.py) contains the instructions required to perform the subsampling steps.
 
 The pipeline expects the input FASTQ files in the following locations:
 
 1_fq_processing/N2/original/N2_original.fastq
-
 1_fq_processing/JU1400/original/JU1400_original.fastq
-
 1_fq_processing/NIC2/original/NIC2_original.fastq
-
 1_fq_processing/JU2526/original/JU2526_original.fastq
-
 1_fq_processing/XZ1516/original/XZ1516_original.fastq
-
 1_fq_processing/MY2693/original/MY2693_original.fastq
-
 1_fq_processing/QX1794/original/QX1794_original.fastq
-
 1_fq_processing/NIC526/original/NIC526_original.fastq
-
 1_fq_processing/DL238/original/DL238_original.fastq
-
 1_fq_processing/ECA396/original/ECA396_original.fastq
-
 1_fq_processing/JU2600/original/JU2600_original.fastq
-
 1_fq_processing/ECA36/original/ECA36_original.fastq
-
 1_fq_processing/EG4725/original/EG4725_original.fastq
-
 1_fq_processing/JU310/original/JU310_original.fastq
-
 1_fq_processing/MY2147/original/MY2147_original.fastq
-
 1_fq_processing/N2/original/N2_original.fastq
