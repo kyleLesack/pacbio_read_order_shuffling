@@ -1,0 +1,8 @@
+name: pbsv_2.9
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - pbsv=2.9.0=h9ee0642_0
+prefix: /home/kyle.lesack1/miniconda3/envs/pbsv_2.9
