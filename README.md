@@ -36,7 +36,7 @@ Several files were too large to include here and need to be downloaded or create
 * *C. elegans PacBio* sequencing data
 	* [PacBio sequencing data](https://www.ncbi.nlm.nih.gov/bioproject?LinkName=sra_bioproject&from_uid=12908562) from the [Caenorhabditis elegans Natural Diversity Resource](https://www.elegansvariation.org/)
 	* [PacBio sequencing data](https://www.ncbi.nlm.nih.gov/sra/?term=DRR142768) for the N2 reference strain
-* *A. thaliana* sequencing are available from BioProject [PRJNA779205](https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJNA779205)
+* *A. thaliana* sequencing data are available from BioProject [PRJNA779205](https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJNA779205)
 
 
 # Snakemake pipeline
