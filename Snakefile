@@ -1,4 +1,4 @@
-include: "0_input/includes/Snakefile.subsample.py"
+include: "0_reference_includes/includes/Snakefile.subsample.py"
 ALL_STRAINS = ["JU1400", "NIC2", "JU2526", "XZ1516", "MY2693", "QX1794", "NIC526", "N2", "DL238","ECA396","JU2600","ECA36","EG4725","MY2147","JU310"]
 
 SHUFFLED_DIRS = ["shuffled1","shuffled2","shuffled3","shuffled4","shuffled5"]
